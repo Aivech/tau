@@ -24,7 +24,7 @@ public class TauBlocks {
         Registry.register(Registry.ITEM, new Identifier(Tau.MODID,b.id),new BlockItem(b,new Item.Settings().group(ItemGroup.MISC)));
     }
 
-    public static void initBlocks() {
+    public static void init() {
         registerWithItemBlock(new BlockBase(FabricBlockSettings.of(Material.STONE).build(),"testblock"));
     }
 }

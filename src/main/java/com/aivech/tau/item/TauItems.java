@@ -16,7 +16,7 @@ public class TauItems {
         Registry.register(Registry.ITEM,new Identifier(Tau.MODID,i.id),i);
     }
 
-    public static void initItems() {
+    public static void init() {
         register(new ItemBase(new Item.Settings().group(ItemGroup.MISC),"testitem"));
     }
 }
