@@ -1,29 +1,29 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "tau",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "Tau",
+  "description": "Reika said it was impossible",
   "authors": [
-    "Me!"
+    "Aivech"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "haha no",
+    "sources": "haha no"
   },
 
-  "license": "CC0-1.0",
-  "icon": "assets/modid/icon.png",
+  "license": "All Rights Reserved",
+  "icon": "assets/tau/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.fabricmc.example.ExampleMod"
+      "com.aivech.tau.Tau"
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    ""
   ],
 
   "depends": {
