@@ -20,12 +20,6 @@
   "entrypoints": {
     "main": [
       "com.aivech.tau.Tau"
-    ],
-    "client": [
-      "com.aivech.tau.TauClient"
-    ],
-    "server": [
-      "com.aivech.tau.TauServer"
     ]
   },
   "mixins": [
