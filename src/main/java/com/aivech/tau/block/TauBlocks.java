@@ -12,10 +12,15 @@ import net.minecraft.util.registry.Registry;
 import java.util.HashMap;
 
 public class TauBlocks {
-    public static final HashMap<String,BlockBase> TAU_BLOCKS = new HashMap();
+    public static final HashMap<String,BlockBase> REGISTRY = new HashMap();
+
+    public static void init() {
+        registerWithItemBlock(new BlockBase(FabricBlockSettings.of(Material.STONE).build(),"testblock"));
+        registerWithItemBlock(new TEBlockTest());
+    }
 
     public static void register(BlockBase b) {
-        TAU_BLOCKS.put(b.id,b);
+        REGISTRY.put(b.id,b);
         Registry.register(Registry.BLOCK, new Identifier(Tau.MODID,b.id),b);
     }
 
@@ -24,7 +29,5 @@ public class TauBlocks {
         Registry.register(Registry.ITEM, new Identifier(Tau.MODID,b.id),new BlockItem(b,new Item.Settings().group(ItemGroup.MISC)));
     }
 
-    public static void init() {
-        registerWithItemBlock(new BlockBase(FabricBlockSettings.of(Material.STONE).build(),"testblock"));
-    }
+
 }

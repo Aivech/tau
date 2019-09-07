@@ -9,10 +9,10 @@ import net.minecraft.util.registry.Registry;
 import java.util.HashMap;
 
 public class TauItems {
-    public static final HashMap<String, ItemBase> TAU_ITEMS = new HashMap();
+    public static final HashMap<String, ItemBase> REGISTRY = new HashMap();
 
     public static void register(ItemBase i) {
-        TAU_ITEMS.put(i.id,i);
+        REGISTRY.put(i.id,i);
         Registry.register(Registry.ITEM,new Identifier(Tau.MODID,i.id),i);
     }
 
