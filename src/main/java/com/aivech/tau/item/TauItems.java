@@ -2,7 +2,6 @@ package com.aivech.tau.item;
 
 import com.aivech.tau.Tau;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
