@@ -26,7 +26,7 @@ public class TauBlocks {
 
     public static void registerWithItemBlock(BlockBase b) {
         register(b);
-        Registry.register(Registry.ITEM, new Identifier(Tau.MODID,b.id),new BlockItem(b,new Item.Settings().group(ItemGroup.MISC)));
+        Registry.register(Registry.ITEM, new Identifier(Tau.MODID,b.id),new BlockItem(b,new Item.Settings().group(Tau.BLOCKS)));
     }
 
 

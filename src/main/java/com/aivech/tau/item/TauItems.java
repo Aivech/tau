@@ -17,6 +17,6 @@ public class TauItems {
     }
 
     public static void init() {
-        register(new ItemBase(new Item.Settings().group(ItemGroup.MISC),"testitem"));
+        register(new ItemBase(new Item.Settings().group(Tau.ITEMS),"testitem"));
     }
 }

@@ -17,8 +17,8 @@ public class Tau implements ModInitializer {
 
     public static Logger log;
     public static final String MODID = "tau";
-    public static ItemGroup blocks;
-    public static ItemGroup items;
+    public static final ItemGroup BLOCKS = FabricItemGroupBuilder.build(new Identifier(MODID,"blocks"),()-> new ItemStack(TauBlocks.REGISTRY.get("testblock")));;
+    public static final ItemGroup ITEMS = FabricItemGroupBuilder.build(new Identifier(MODID,"items"),()-> new ItemStack(TauItems.REGISTRY.get("testitem")));;
 
     @Override
     public void onInitialize() {
@@ -27,27 +27,5 @@ public class Tau implements ModInitializer {
         TauBlocks.init();
         TauItems.init();
         TauTileEntities.init();
-
-        blocks = FabricItemGroupBuilder.create(
-                new Identifier(MODID,"blocks"))
-                .icon(()-> new ItemStack(TauBlocks.REGISTRY.get("testblock")))
-                .appendItems(stacks ->
-                {
-                    for (BlockBase b :TauBlocks.REGISTRY.values()) {
-                        stacks.add(new ItemStack(b));
-                    }
-                })
-                .build();
-
-        items = FabricItemGroupBuilder.create(
-                new Identifier(MODID,"items"))
-                .icon(()-> new ItemStack(TauItems.REGISTRY.get("testitem")))
-                .appendItems(stacks ->
-                {
-                    for (ItemBase i :TauItems.REGISTRY.values()) {
-                        stacks.add(new ItemStack(i));
-                    }
-                })
-                .build();
     }
 }
