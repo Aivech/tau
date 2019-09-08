@@ -1,16 +1,36 @@
 package com.aivech.tau.power;
 
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+
 public class RotaryNode {
     public int speed;
     public int torque;
 
-    public final NodeType type;
-
-    public RotaryNode(NodeType type) {
+    private final BlockPos pos;
+    private final NodeType type;
+    private final Direction dir;
+    public RotaryNode(NodeType type, BlockPos pos, Direction dir) {
         this.type = type;
+        this.pos = pos;
+        this.dir = dir;
     }
 
     public enum NodeType {
         SOURCE, SINK, PATH
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof RotaryNode) {
+            RotaryNode node = (RotaryNode)o;
+            return (node.pos.equals(this.pos)) && (node.type == this.type) && (node.dir == this.dir);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return pos.getY() << 24 + pos.getX() << 14 + pos.getZ() << 4 + this.type.ordinal() << 2 + this.dir.ordinal();
     }
 }
