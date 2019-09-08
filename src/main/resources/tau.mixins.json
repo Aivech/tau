@@ -3,10 +3,9 @@
   "package": "com.aivech.tau.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    ""
+    "WorldLoadEvent$ServerLoadDimMixin"
   ],
   "client": [
-    "ExampleMixin"
   ],
   "injectors": {
     "defaultRequire": 1

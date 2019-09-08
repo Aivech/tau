@@ -15,7 +15,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 
 public class Tau implements ModInitializer {
 
-    public static Logger log;
+    private static Logger log;
     public static final String MODID = "tau";
     public static final ItemGroup BLOCKS = FabricItemGroupBuilder.build(new Identifier(MODID, "blocks"), () -> new ItemStack(TauBlocks.REGISTRY.get("testblock")));
     public static final ItemGroup ITEMS = FabricItemGroupBuilder.build(new Identifier(MODID, "items"), () -> new ItemStack(TauItems.REGISTRY.get("testitem")));
@@ -23,11 +23,22 @@ public class Tau implements ModInitializer {
     @Override
     public void onInitialize() {
         log = LogManager.getLogger(MODID);
+        Log.info("Not Warhammer.");
 
         Configurator.setLevel("tau", Level.DEBUG);
 
         TauBlocks.init();
         TauItems.init();
         TauBlockEntities.init();
+    }
+
+    public static class Log {
+        public static void info(String s) {
+            log.info("[Tau] "+s);
+        }
+
+        public static void debug(String s) {
+            log.debug("[Tau] "+s);
+        }
     }
 }

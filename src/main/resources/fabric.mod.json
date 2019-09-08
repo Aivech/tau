@@ -23,7 +23,7 @@
     ]
   },
   "mixins": [
-    ""
+    "tau.mixins.json"
   ],
 
   "depends": {

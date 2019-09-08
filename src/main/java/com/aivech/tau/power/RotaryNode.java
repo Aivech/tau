@@ -3,9 +3,13 @@ package com.aivech.tau.power;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
+import java.util.ArrayList;
+
 public class RotaryNode {
     public int speed;
     public int torque;
+
+    ArrayList<RotaryPath> paths = new ArrayList<>();
 
     private final BlockPos pos;
     private final NodeType type;
