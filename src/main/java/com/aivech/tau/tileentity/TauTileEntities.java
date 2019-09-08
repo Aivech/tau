@@ -20,8 +20,8 @@ public class TauTileEntities {
         TypeDelegate type = new TypeDelegate();
         type.type = Registry.register(
                 Registry.BLOCK_ENTITY,
-                new Identifier(Tau.MODID,b.id),
-                BlockEntityType.Builder.create(() -> new TileEntityBase(type.type),b).build(null));
+                new Identifier(Tau.MODID, b.id),
+                BlockEntityType.Builder.create(() -> new TileEntityBase(type.type), b).build(null));
         REGISTRY.put(b.id, type.type);
 
     }

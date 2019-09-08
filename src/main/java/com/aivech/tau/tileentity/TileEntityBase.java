@@ -10,5 +10,4 @@ public class TileEntityBase extends BlockEntity {
     }
 
 
-
 }

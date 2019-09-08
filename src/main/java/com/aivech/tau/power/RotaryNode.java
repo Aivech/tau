@@ -22,6 +22,7 @@ public class RotaryNode {
 
     @Override
     public boolean equals(Object o) {
+        if (o == null) { return false; }
         if (o instanceof RotaryNode) {
             RotaryNode node = (RotaryNode)o;
             return (node.pos.equals(this.pos)) && (node.type == this.type) && (node.dir == this.dir);
