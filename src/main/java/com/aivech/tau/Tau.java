@@ -2,7 +2,7 @@ package com.aivech.tau;
 
 import com.aivech.tau.block.TauBlocks;
 import com.aivech.tau.item.TauItems;
-import com.aivech.tau.tileentity.TauTileEntities;
+import com.aivech.tau.tileentity.TauBlockEntities;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.minecraft.item.ItemGroup;
@@ -24,6 +24,6 @@ public class Tau implements ModInitializer {
 
         TauBlocks.init();
         TauItems.init();
-        TauTileEntities.init();
+        TauBlockEntities.init();
     }
 }

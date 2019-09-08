@@ -9,8 +9,8 @@ import net.minecraft.util.registry.Registry;
 
 import java.util.HashMap;
 
-public class TauTileEntities {
-    public static final HashMap<String, BlockEntityType<TileEntityBase>> REGISTRY = new HashMap<>();
+public class TauBlockEntities {
+    public static final HashMap<String, BlockEntityType<BlockEntityBase>> REGISTRY = new HashMap<>();
 
     public static void init() {
         register(TauBlocks.REGISTRY.get("te_test"));
@@ -21,12 +21,12 @@ public class TauTileEntities {
         type.type = Registry.register(
                 Registry.BLOCK_ENTITY,
                 new Identifier(Tau.MODID, b.id),
-                BlockEntityType.Builder.create(() -> new TileEntityBase(type.type), b).build(null));
+                BlockEntityType.Builder.create(() -> new BlockEntityBase(type.type), b).build(null));
         REGISTRY.put(b.id, type.type);
 
     }
 
     public static class TypeDelegate {
-        BlockEntityType<TileEntityBase> type;
+        BlockEntityType<BlockEntityBase> type;
     }
 }

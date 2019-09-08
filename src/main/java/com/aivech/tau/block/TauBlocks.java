@@ -15,7 +15,7 @@ public class TauBlocks {
 
     public static void init() {
         registerWithItemBlock(new BlockBase(FabricBlockSettings.of(Material.STONE).build(),"testblock"));
-        registerWithItemBlock(new TEBlockTest());
+        registerWithItemBlock(new BEBlockTest());
     }
 
     public static void register(BlockBase b) {
