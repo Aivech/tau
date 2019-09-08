@@ -1,4 +1,4 @@
-package com.aivech.tau.tileentity;
+package com.aivech.tau.blockentity;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;

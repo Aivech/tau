@@ -1,7 +1,7 @@
 package com.aivech.tau.block;
 
-import com.aivech.tau.tileentity.TauBlockEntities;
-import com.aivech.tau.tileentity.BlockEntityBase;
+import com.aivech.tau.blockentity.TauBlockEntities;
+import com.aivech.tau.blockentity.BlockEntityBase;
 import net.fabricmc.fabric.api.block.FabricBlockSettings;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.Material;

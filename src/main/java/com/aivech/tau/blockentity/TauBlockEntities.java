@@ -1,4 +1,4 @@
-package com.aivech.tau.tileentity;
+package com.aivech.tau.blockentity;
 
 import com.aivech.tau.Tau;
 import com.aivech.tau.block.BlockBase;

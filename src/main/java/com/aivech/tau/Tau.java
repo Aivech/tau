@@ -2,7 +2,7 @@ package com.aivech.tau;
 
 import com.aivech.tau.block.TauBlocks;
 import com.aivech.tau.item.TauItems;
-import com.aivech.tau.tileentity.TauBlockEntities;
+import com.aivech.tau.blockentity.TauBlockEntities;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.minecraft.item.ItemGroup;
