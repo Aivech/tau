@@ -3,7 +3,8 @@
   "package": "com.aivech.tau.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "WorldLoadEvent$ServerLoadDimMixin"
+    "WorldLoadEvent$ServerLoadDimMixin",
+    "WorldUnloadEvent"
   ],
   "client": [
   ],
