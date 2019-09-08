@@ -22,7 +22,7 @@ public class WorldLoadEvent {
     public static class ServerLoadDimMixin {
         @Inject(at = @At(value = "INVOKE", shift = At.Shift.AFTER,
                 target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-                ordinal=1),
+                ordinal = 1),
                 method = "createWorlds",
                 locals = LocalCapture.CAPTURE_FAILHARD
         )
@@ -38,10 +38,10 @@ public class WorldLoadEvent {
                 DimensionType dimensionType_1
         ) {
             WorldLoadCallback.EVENT.invoker().onLoad(((MinecraftServer)(Object)this).getWorld(dimensionType_1));
-            Tau.Log.debug("Firing WorldLoadEvent for "+dimensionType_1.toString());
+            Tau.Log.debug("Firing WorldLoadEvent for " + dimensionType_1.toString());
         }
 
-        @Inject(at=@At(value="INVOKE", shift = At.Shift.AFTER,
+        @Inject(at = @At(value = "INVOKE", shift = At.Shift.AFTER,
                 target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 0),
                 method = "createWorlds")
         private void tau_onWorldLoad_onServerLoadOverworld(
