@@ -13,7 +13,7 @@
     "sources": "haha no"
   },
 
-  "license": "All Rights Reserved",
+  "license": "MIT",
   "icon": "assets/tau/icon.png",
 
   "environment": "*",
@@ -28,9 +28,10 @@
 
   "depends": {
     "fabricloader": ">=0.4.0",
-    "fabric": "*"
+    "fabric": "*",
+
+    "libgui": ">=1.3.2"
   },
   "suggests": {
-    "flamingo": "*"
   }
 }
