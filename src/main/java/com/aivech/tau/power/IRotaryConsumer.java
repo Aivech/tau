@@ -1,4 +1,6 @@
 package com.aivech.tau.power;
 
-public interface IRotaryConsumer extends IRotaryTile {
+public interface IRotaryConsumer extends IRotaryBlock {
+    int setSpeed();
+    int setTorque();
 }
