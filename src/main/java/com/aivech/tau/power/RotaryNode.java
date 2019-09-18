@@ -29,10 +29,6 @@ public class RotaryNode {
         SOURCE, SINK, PATH
     }
 
-    void invalidatePaths() {
-        // TODO
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null) { return false; }

@@ -50,7 +50,7 @@ public class RotaryGrid extends Thread {
                     while(this.queue.peek() != null) {
                         GridUpdate update = queue.poll();
                         switch(update.action) {
-                            case ADD: add(((GridUpdate.Add)update).node); break;
+                            case ADD: add(update.node); break;
                             case DEL: break;
                             case UPDATE: break;
                         }
@@ -86,11 +86,19 @@ public class RotaryGrid extends Thread {
                 for(RotaryNode neighbor : connects) {
                     if(neighbor.connects.contains(dir.getOpposite())) {
                         graph.putEdge(node,neighbor);
-                        neighbor.invalidatePaths();
+
+                        this.invalidatePaths(node);
                     }
                 }
             }
         }
+    }
+
+    private void invalidatePaths(RotaryNode node) {
+        for(RotaryPath path : node.paths) {
+            pathfind.add(path.nodes.get(0));
+        }
+        node.paths.clear();
     }
 
     public static void registerHandlers() {

@@ -8,20 +8,13 @@ import net.minecraft.world.dimension.DimensionType;
 import java.util.Arrays;
 import java.util.Collection;
 
-public abstract class GridUpdate {
+public class GridUpdate {
     final GridAction action;
+    final RotaryNode node;
 
-    private GridUpdate(GridAction action) {
+    private GridUpdate(GridAction action, RotaryNode node) {
+        this.node = node;
         this.action = action;
-    }
-
-    static class Add extends GridUpdate {
-        final RotaryNode node;
-
-        private Add(RotaryNode node) {
-            super(GridAction.ADD);
-            this.node = node;
-        }
     }
 
     public static void add(IRotaryBlock block, World world, BlockPos blockPos, Direction orient, Collection<Direction> connectsTo) {
@@ -35,9 +28,7 @@ public abstract class GridUpdate {
         }
         RotaryNode node = new RotaryNode(RotaryNode.NodeType.SINK, blockPos, orient, connectsTo);
 
-        RotaryGrid.UPDATE_QUEUES.get(DimensionType.getId(world.getDimension().getType())).add(
-                new GridUpdate.Add(node)
-        );
+        RotaryGrid.UPDATE_QUEUES.get(DimensionType.getId(world.getDimension().getType())).add(new GridUpdate(GridAction.ADD,node));
     }
 
     // convenience method because Direction.ALL is an array
@@ -45,7 +36,7 @@ public abstract class GridUpdate {
         add(block, world, blockPos, orient, Arrays.asList(connectsTo));
     }
 
-    public enum GridAction {
+    enum GridAction {
         ADD, DEL, UPDATE
     }
 }

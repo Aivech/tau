@@ -8,7 +8,7 @@ public class RotaryPath {
 
     @Override
     public int hashCode() {
-        return nodes.get(1).hashCode() ^ nodes.get(nodes.size()-1).hashCode();
+        return nodes.get(0).hashCode() ^ nodes.get(nodes.size()-1).hashCode();
     }
 
     @Override
