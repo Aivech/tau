@@ -4,6 +4,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RotaryNode {
@@ -16,10 +18,17 @@ public class RotaryNode {
     protected final BlockPos pos;
     protected final NodeType type;
     protected final Direction dir;
-    public RotaryNode(NodeType type, BlockPos pos, Direction dir) {
+    protected final ArrayList<Direction> connects;
+
+    public RotaryNode(NodeType type, BlockPos pos, Direction dir, List<Direction> connectsTo) {
         this.type = type;
         this.pos = pos;
         this.dir = dir;
+        this.connects = new ArrayList<>(connectsTo);
+    }
+
+    public RotaryNode(NodeType type, BlockPos pos, Direction dir, Direction[] connectsTo) {
+        this(type,pos,dir,Arrays.asList(connectsTo));
     }
 
     public enum NodeType {
