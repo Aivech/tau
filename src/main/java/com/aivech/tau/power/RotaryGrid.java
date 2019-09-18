@@ -57,6 +57,10 @@ public class RotaryGrid extends Thread {
             Tau.Log.debug("Stopping thread for "+ this.id.toString());
             inputQueues.remove(id);
             grids.remove(id);
+        } catch (ClassCastException e) {
+            Tau.Log.fatal("Invalid operation performed on the grid. If this happens, it means someone needs to stop abusing the API.");
+            Tau.Log.fatal("https://youtu.be/Zb67FzEmEcY?t=3");
+            throw(e);
         }
 
     }

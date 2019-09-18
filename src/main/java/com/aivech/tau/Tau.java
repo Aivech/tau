@@ -33,12 +33,14 @@ public class Tau implements ModInitializer {
     }
 
     public static class Log {
+        public static void debug(String s) {
+            log.debug("[Tau] "+s);
+        }
         public static void info(String s) {
             log.info("[Tau] "+s);
         }
         public static void error(String s) { log.error("[Tau] "+s);}
-        public static void debug(String s) {
-            log.debug("[Tau] "+s);
-        }
+        public static void fatal(String s) { log.fatal("[Tau] "+s); }
+
     }
 }
