@@ -1,6 +1,8 @@
 package com.aivech.tau.power;
 
 import com.aivech.tau.Tau;
+import com.aivech.tau.event.WorldLoadCallback;
+import com.aivech.tau.event.WorldUnloadCallback;
 import com.google.common.collect.HashMultimap;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
@@ -24,7 +26,7 @@ public class RotaryGrid extends Thread {
     private final ConcurrentLinkedQueue<GridUpdate> queue = new ConcurrentLinkedQueue<>();
 
 
-    private final HashMultimap<BlockPos,RotaryNode> nodes = new HashMultimap<>();
+    private final HashMultimap<BlockPos,RotaryNode> nodes = HashMultimap.create();
     private final HashSet<RotaryNode> sources = new HashSet<>();
     private final HashSet<RotaryNode> sinks = new HashSet<>();
 
@@ -32,9 +34,7 @@ public class RotaryGrid extends Thread {
 
     public RotaryGrid(Identifier dimension) {
         graph = GraphBuilder.undirected().allowsSelfLoops(false).build();
-        grids.put(dimension,this);
         this.id = dimension;
-        inputQueues.put(dimension, this.queue);
     }
 
     @Override
@@ -55,14 +55,28 @@ public class RotaryGrid extends Thread {
             }
         } catch (InterruptedException e) {
             Tau.Log.debug("Stopping thread for "+ this.id.toString());
-            inputQueues.remove(id);
             grids.remove(id);
+            inputQueues.remove(id);
         } catch (ClassCastException e) {
             Tau.Log.fatal("Invalid operation performed on the grid. If this happens, it means someone needs to stop abusing the API.");
             Tau.Log.fatal("https://youtu.be/Zb67FzEmEcY?t=3");
             throw(e);
         }
 
+    }
+
+    public static void registerHandlers() {
+        WorldLoadCallback.EVENT.register((world -> {
+            Identifier dimId = DimensionType.getId(world.getDimension().getType());
+            RotaryGrid grid = new RotaryGrid(dimId);
+            grids.put(dimId,grid);
+            inputQueues.put(dimId,grid.queue);
+            grid.start();
+        }));
+        WorldUnloadCallback.EVENT.register((world -> {
+            Identifier dimId = DimensionType.getId(world.getDimension().getType());
+            grids.get(dimId).interrupt();
+        }));
     }
 
     public static void addNode(IRotaryBlock block, World world, BlockPos blockPos, Direction orient, Direction[] connectsTo) {

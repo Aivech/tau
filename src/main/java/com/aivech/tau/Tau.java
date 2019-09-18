@@ -3,6 +3,7 @@ package com.aivech.tau;
 import com.aivech.tau.block.TauBlocks;
 import com.aivech.tau.item.TauItems;
 import com.aivech.tau.blockentity.TauBlockEntities;
+import com.aivech.tau.power.RotaryGrid;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.minecraft.item.ItemGroup;
@@ -30,6 +31,8 @@ public class Tau implements ModInitializer {
         TauBlocks.init();
         TauItems.init();
         TauBlockEntities.init();
+
+        RotaryGrid.registerHandlers();
     }
 
     public static class Log {
