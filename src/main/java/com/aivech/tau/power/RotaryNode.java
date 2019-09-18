@@ -4,16 +4,18 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RotaryNode {
-    public int speed;
-    public int torque;
 
-    ArrayList<RotaryPath> paths = new ArrayList<>();
+    /**
+     * touch this and die in CME hell
+     **/
+    final ArrayList<RotaryPath> paths = new ArrayList<>();
 
-    private final BlockPos pos;
-    private final NodeType type;
-    private final Direction dir;
+    protected final BlockPos pos;
+    protected final NodeType type;
+    protected final Direction dir;
     public RotaryNode(NodeType type, BlockPos pos, Direction dir) {
         this.type = type;
         this.pos = pos;
