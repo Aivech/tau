@@ -1,15 +1,17 @@
 package com.aivech.tau.power;
 
 public abstract class GridUpdate {
-    public final GridAction action;
+    protected final GridAction action;
 
     public GridUpdate(GridAction action) {
         this.action = action;
     }
 
     public class Add extends GridUpdate {
-        public Add() {
+        final RotaryNode node;
+        public Add(RotaryNode node) {
             super(GridAction.ADD);
+            this.node = node;
         }
     }
 

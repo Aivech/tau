@@ -14,6 +14,7 @@ import net.minecraft.world.dimension.DimensionType;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class RotaryGrid extends Thread {
@@ -30,6 +31,8 @@ public class RotaryGrid extends Thread {
     private final HashSet<RotaryNode> sources = new HashSet<>();
     private final HashSet<RotaryNode> sinks = new HashSet<>();
 
+    private final HashSet<RotaryNode> pathfind = new HashSet<>();
+
     protected final Object lock = new Object();
 
     public RotaryGrid(Identifier dimension) {
@@ -39,6 +42,7 @@ public class RotaryGrid extends Thread {
 
     @Override
     public void run() {
+        Tau.Log.debug("Starting grid worker thread for "+this.id.toString());
         try {
             synchronized(lock) {
                 while(!Thread.interrupted()) {
@@ -46,7 +50,7 @@ public class RotaryGrid extends Thread {
                     while(this.queue.peek() != null) {
                         GridUpdate update = queue.poll();
                         switch(update.action) {
-                            case ADD: break;
+                            case ADD: add(((GridUpdate.Add)update).node); break;
                             case DEL: break;
                             case UPDATE: break;
                         }
@@ -54,15 +58,39 @@ public class RotaryGrid extends Thread {
                 }
             }
         } catch (InterruptedException e) {
-            Tau.Log.debug("Stopping thread for "+ this.id.toString());
-            grids.remove(id);
-            inputQueues.remove(id);
         } catch (ClassCastException e) {
             Tau.Log.fatal("Invalid operation performed on the grid. If this happens, it means someone needs to stop abusing the API.");
             Tau.Log.fatal("https://youtu.be/Zb67FzEmEcY?t=3");
             throw(e);
         }
+        Tau.Log.debug("Stopping grid worker thread for "+ this.id.toString());
+        grids.remove(id);
+        inputQueues.remove(id);
+    }
 
+    private void add(RotaryNode node) {
+        // add to graph and caches
+        graph.addNode(node);
+        nodes.put(node.pos, node);
+        switch(node.type) {
+            case SINK : sinks.add(node); break;
+            case SOURCE : sources.add(node); break;
+            case PATH : break;
+        }
+
+        // connect to adjacents
+        for (Direction dir : node.connects) {
+            BlockPos offset = node.pos.offset(dir);
+            Set<RotaryNode> connects = nodes.get(offset);
+            if(connects != null) {
+                for(RotaryNode neighbor : connects) {
+                    if(neighbor.connects.contains(dir.getOpposite())) {
+                        graph.putEdge(node,neighbor);
+                        neighbor.invalidatePaths();
+                    }
+                }
+            }
+        }
     }
 
     public static void registerHandlers() {
@@ -93,11 +121,7 @@ public class RotaryGrid extends Thread {
         RotaryNode node = new RotaryNode(RotaryNode.NodeType.SINK,blockPos, orient,connectsTo);
         grid.graph.addNode(node);
         grid.nodes.put(blockPos,node);
-        switch(type) {
-            case SINK : grid.sinks.add(node); break;
-            case SOURCE : grid.sources.add(node); break;
-            case PATH : break;
-        }
+
     }
 
 }

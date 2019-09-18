@@ -3,9 +3,7 @@ package com.aivech.tau.power;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RotaryNode {
@@ -18,13 +16,13 @@ public class RotaryNode {
     protected final BlockPos pos;
     protected final NodeType type;
     protected final Direction dir;
-    protected final ArrayList<Direction> connects;
+    protected final HashSet<Direction> connects;
 
-    public RotaryNode(NodeType type, BlockPos pos, Direction dir, List<Direction> connectsTo) {
+    public RotaryNode(NodeType type, BlockPos pos, Direction dir, Collection<Direction> connectsTo) {
         this.type = type;
         this.pos = pos;
         this.dir = dir;
-        this.connects = new ArrayList<>(connectsTo);
+        this.connects = new HashSet<>(connectsTo);
     }
 
     public RotaryNode(NodeType type, BlockPos pos, Direction dir, Direction[] connectsTo) {
@@ -33,6 +31,10 @@ public class RotaryNode {
 
     public enum NodeType {
         SOURCE, SINK, PATH
+    }
+
+    void invalidatePaths() {
+        // TODO
     }
 
     @Override
