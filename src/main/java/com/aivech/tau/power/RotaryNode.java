@@ -25,10 +25,6 @@ public class RotaryNode {
         this.connects = new HashSet<>(connectsTo);
     }
 
-    public RotaryNode(NodeType type, BlockPos pos, Direction dir, Direction[] connectsTo) {
-        this(type,pos,dir,Arrays.asList(connectsTo));
-    }
-
     public enum NodeType {
         SOURCE, SINK, PATH
     }

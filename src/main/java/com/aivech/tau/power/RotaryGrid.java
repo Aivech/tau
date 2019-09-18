@@ -18,9 +18,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class RotaryGrid extends Thread {
-    protected static final HashMap<Identifier, ConcurrentLinkedQueue<GridUpdate>> inputQueues = new HashMap<>();
+    static final HashMap<Identifier, ConcurrentLinkedQueue<GridUpdate>> UPDATE_QUEUES = new HashMap<>();
     // public static final HashMap<Identifier, ConcurrentLinkedQueue<RotaryUpdate>> outputQueues = new HashMap<>();
-    private static final HashMap<Identifier,RotaryGrid> grids = new HashMap<>();
+    private static final HashMap<Identifier,RotaryGrid> GRIDS = new HashMap<>();
 
     private final MutableGraph<RotaryNode> graph;
     private final Identifier id;
@@ -64,8 +64,8 @@ public class RotaryGrid extends Thread {
             throw(e);
         }
         Tau.Log.debug("Stopping grid worker thread for "+ this.id.toString());
-        grids.remove(id);
-        inputQueues.remove(id);
+        GRIDS.remove(id);
+        UPDATE_QUEUES.remove(id);
     }
 
     private void add(RotaryNode node) {
@@ -97,31 +97,14 @@ public class RotaryGrid extends Thread {
         WorldLoadCallback.EVENT.register((world -> {
             Identifier dimId = DimensionType.getId(world.getDimension().getType());
             RotaryGrid grid = new RotaryGrid(dimId);
-            grids.put(dimId,grid);
-            inputQueues.put(dimId,grid.queue);
+            GRIDS.put(dimId,grid);
+            UPDATE_QUEUES.put(dimId,grid.queue);
             grid.start();
         }));
         WorldUnloadCallback.EVENT.register((world -> {
             Identifier dimId = DimensionType.getId(world.getDimension().getType());
-            grids.get(dimId).interrupt();
+            GRIDS.get(dimId).interrupt();
         }));
-    }
-
-    public static void addNode(IRotaryBlock block, World world, BlockPos blockPos, Direction orient, Direction[] connectsTo) {
-        RotaryGrid grid = grids.get(DimensionType.getId(world.getDimension().getType()));
-        RotaryNode.NodeType type;
-        if(block instanceof IRotaryUser) {
-            type = RotaryNode.NodeType.SINK;
-        } else if(block instanceof IRotaryProvider) {
-            type = RotaryNode.NodeType.SOURCE;
-        } else {
-            type = RotaryNode.NodeType.PATH;
-        }
-
-        RotaryNode node = new RotaryNode(RotaryNode.NodeType.SINK,blockPos, orient,connectsTo);
-        grid.graph.addNode(node);
-        grid.nodes.put(blockPos,node);
-
     }
 
 }
