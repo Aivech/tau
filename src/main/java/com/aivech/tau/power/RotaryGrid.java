@@ -29,6 +29,7 @@ public class RotaryGrid extends Thread {
     private final HashSet<RotaryNode> sinks = new HashSet<>();
 
     private final HashSet<RotaryNode> pathfind = new HashSet<>();
+    private final HashSet<RotaryNode> update = new HashSet<>();
 
     protected final Object lock = new Object();
 
@@ -135,7 +136,11 @@ public class RotaryGrid extends Thread {
 
     private void invalidatePaths(RotaryNode node) {
         for(RotaryPath path : node.paths) {
-            pathfind.add(path.nodes.get(0));
+            pathfind.add(path.firstNode);
+            for(RotaryNode n : path.nodeSet) {
+                if(!n.equals(node))
+                    update.add(n);
+            }
         }
         node.paths.clear();
     }
@@ -174,5 +179,59 @@ public class RotaryGrid extends Thread {
             next = tmp;
         }
         return visited;
+    }
+
+    private class RotarySubgrid {
+        private HashSet<RotaryNode> nodes;
+        private ArrayList<RotaryNode> roots = new ArrayList<>();
+        private ArrayList<RotaryPath> paths = new ArrayList<>();
+
+        private RotarySubgrid(HashSet<RotaryNode> nodes) {
+            this.nodes = nodes;
+            for(RotaryNode n : nodes) {
+                if(sources.contains(n))
+                    roots.add(n);
+            }
+        }
+
+        private void solve() {
+            for(RotaryNode source : roots) {
+                RotaryPath first = new RotaryPath(source);
+                ArrayDeque<RotaryPath> next = new ArrayDeque<>();
+                next.addLast(first);
+                while(!next.isEmpty()) {
+                    RotaryPath path = next.pollFirst();
+                    while(true) {
+                        RotaryNode node = path.getLast();
+                        int degree = graph.degree(node);
+                        if (sinks.contains(node) || degree < 2) { // end of path
+                            paths.add(path);
+                            break;
+                        }
+                        Set<RotaryNode> adjacent = graph.adjacentNodes(node);
+                        ArrayDeque<RotaryNode> children  = new ArrayDeque<>();
+                        for(RotaryNode neighbor : adjacent) {
+                            if (!path.contains(neighbor) && node.canPathTo(neighbor)) children.addLast(neighbor);
+                        }
+                        if(children.isEmpty()) { // loop & deadend avoidance
+                            paths.add(path);
+                            break;
+                        }
+                        path.append(children.pollFirst());
+                        while(!children.isEmpty()) {
+                            RotaryPath branch = path.copy();
+                            branch.append(children.pollFirst());
+                            next.addLast(branch);
+                        }
+                    }
+                }
+            }
+            for(RotaryPath path : paths) {
+                for(RotaryNode node : path.nodeSet) {
+                    node.paths.add(path);
+
+                }
+            }
+        }
     }
 }

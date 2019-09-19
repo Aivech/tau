@@ -1,18 +1,45 @@
 package com.aivech.tau.power;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 public class RotaryPath {
-    public ArrayList<RotaryNode> nodes;
+    final RotaryNode firstNode;
+    final LinkedHashSet<RotaryNode> nodeSet = new LinkedHashSet<>();
+    private RotaryNode lastNode;
 
+    public RotaryPath(RotaryNode n) {
+        firstNode = n;
+        lastNode = n;
+    }
+
+    public RotaryPath copy() {
+        RotaryPath copy = new RotaryPath(this.firstNode);
+        for(RotaryNode node : nodeSet) {
+            copy.append(node);
+        }
+        return copy;
+    }
+
+    public void append(RotaryNode n) {
+        lastNode = n;
+        nodeSet.add(n);
+    }
+
+    public boolean contains(RotaryNode n) {
+        return nodeSet.contains(n);
+    }
+
+    public RotaryNode getLast() {
+        return lastNode;
+    }
 
     @Override
     public int hashCode() {
-        return nodes.get(0).hashCode() ^ nodes.get(nodes.size()-1).hashCode();
+        return firstNode.hashCode() ^ lastNode.hashCode();
     }
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof RotaryPath && ((RotaryPath)o).nodes.equals(nodes);
+        return this == o || (o instanceof RotaryPath && ((RotaryPath)o).nodeSet.equals(nodeSet));
     }
 }

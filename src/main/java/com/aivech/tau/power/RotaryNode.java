@@ -1,7 +1,9 @@
 package com.aivech.tau.power;
 
+import com.aivech.tau.Tau;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3i;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -13,21 +15,50 @@ public class RotaryNode {
      **/
     final ArrayList<RotaryPath> paths = new ArrayList<>();
 
-    protected final BlockPos pos;
-    protected final NodeType type;
-    protected final Direction dir;
-    protected final HashSet<Direction> connects;
+    final BlockPos pos;
+    final NodeType type;
+    final Direction dir;
+    final HashSet<Direction> connects;
 
-    public RotaryNode(NodeType type, BlockPos pos, Direction dir, Collection<Direction> connectsTo) {
+    RotaryNode(NodeType type, BlockPos pos, Direction dir, Collection<Direction> connectsTo) {
         this.type = type;
         this.pos = pos;
         this.dir = dir;
         this.connects = new HashSet<>(connectsTo);
     }
 
-    public enum NodeType {
-        SOURCE, SINK, PATH, MERGE, CLUTCH, MUTATE
+    boolean canPathTo(RotaryNode neighbor) {
+        return true;
     }
+
+    public enum NodeType {
+        SOURCE, SINK, PATH, JUNCTION, CLUTCH, MUTATE
+    }
+
+    static class Junction extends RotaryNode {
+        final boolean merge;
+        Junction(NodeType type, BlockPos pos, Direction dir, Collection<Direction> connectsTo, boolean merge) {
+            super(type,pos,dir,connectsTo);
+            this.merge = merge;
+        }
+
+        @Override
+        boolean canPathTo(RotaryNode neighbor) {
+            Vec3i offset = neighbor.pos.subtract(pos);
+            Direction toNeighbor = Direction.fromVector(offset.getX(), offset.getY(),offset.getZ());
+            Tau.Log.debug("Neighbor is "+toNeighbor.toString());
+            if(neighbor instanceof Junction) {
+                Junction junc = (Junction)neighbor;
+                if(junc.connects.contains(dir.getOpposite()) && junc.merge == (junc.dir != dir.getOpposite())) {
+                    return this.merge == (this.dir == toNeighbor);
+                }
+            }
+            return this.merge == (this.dir == toNeighbor) && neighbor.connects.contains(toNeighbor.getOpposite());
+        }
+
+
+    }
+
 
     @Override
     public boolean equals(Object o) {
