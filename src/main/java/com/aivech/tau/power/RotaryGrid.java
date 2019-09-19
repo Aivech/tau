@@ -9,7 +9,6 @@ import com.google.common.graph.MutableGraph;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 
 import java.util.*;
@@ -45,6 +44,8 @@ public class RotaryGrid extends Thread {
             synchronized(lock) {
                 while(!Thread.interrupted()) {
                     lock.wait();
+
+                    // Resolve queue
                     while(this.queue.peek() != null) {
                         GridUpdate update = queue.poll();
                         switch(update.action) {
@@ -54,9 +55,11 @@ public class RotaryGrid extends Thread {
                         }
                     }
 
+                    // Create subgrids for pathfinding
                     ArrayList<MutableGraph<RotaryNode>> subgraphs = new ArrayList<>();
                     for(RotaryNode node : pathfind) {
                         pathfind.remove(node);
+                        if(graph.adjacentNodes(node).isEmpty()) continue;
                         subgraphs.add(findSubgrid(node));
                     }
                 }

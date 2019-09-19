@@ -26,7 +26,7 @@ public class RotaryNode {
     }
 
     public enum NodeType {
-        SOURCE, SINK, PATH
+        SOURCE, SINK, PATH, MERGE, CLUTCH, MUTATE
     }
 
     @Override
@@ -41,6 +41,6 @@ public class RotaryNode {
 
     @Override
     public int hashCode() {
-        return pos.getY() << 24 + pos.getX() << 14 + pos.getZ() << 4 + this.type.ordinal() << 2 + this.dir.ordinal();
+        return pos.getY() << 24 + pos.getX() << 14 + pos.getZ() << 4 + (this.type.ordinal() ^ this.dir.ordinal());
     }
 }
