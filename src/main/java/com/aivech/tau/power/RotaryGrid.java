@@ -12,9 +12,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class RotaryGrid extends Thread {
@@ -51,9 +49,15 @@ public class RotaryGrid extends Thread {
                         GridUpdate update = queue.poll();
                         switch(update.action) {
                             case ADD: add(update.node); break;
-                            case DEL: break;
+                            case DEL: remove(update.pos,update.dir); break;
                             case UPDATE: break;
                         }
+                    }
+
+                    ArrayList<MutableGraph<RotaryNode>> subgraphs = new ArrayList<>();
+                    for(RotaryNode node : pathfind) {
+                        pathfind.remove(node);
+                        subgraphs.add(findSubgrid(node));
                     }
                 }
             }
@@ -74,7 +78,10 @@ public class RotaryGrid extends Thread {
         nodes.put(node.pos, node);
         switch(node.type) {
             case SINK : sinks.add(node); break;
-            case SOURCE : sources.add(node); break;
+            case SOURCE :
+                sources.add(node);
+                pathfind.add(node);
+                break;
             case PATH : break;
         }
 
@@ -93,6 +100,35 @@ public class RotaryGrid extends Thread {
             }
         }
     }
+
+    private void remove(BlockPos pos, Direction dir) {
+        Set<RotaryNode> removed = nodes.get(pos);
+        for(RotaryNode node : removed) {
+            if(dir == null || node.dir == dir){
+                this.invalidatePaths(node);
+                graph.removeNode(node);
+                nodes.remove(pos,node);
+                sources.remove(node);
+                sinks.remove(node);
+                pathfind.remove(node);
+            }
+        }
+    }
+
+    private MutableGraph<RotaryNode> findSubgrid(RotaryNode node) {
+        MutableGraph<RotaryNode> subgraph = GraphBuilder.undirected().allowsSelfLoops(false).build();
+        HashSet<RotaryNode> visited = findConnected(node);
+        for (RotaryNode n : visited) {
+            subgraph.addNode(n);
+            graph.adjacentNodes(n).forEach((child -> {
+                subgraph.putEdge(n,child);
+            }));
+        }
+
+        return subgraph;
+    }
+
+
 
     private void invalidatePaths(RotaryNode node) {
         for(RotaryPath path : node.paths) {
@@ -115,4 +151,25 @@ public class RotaryGrid extends Thread {
         }));
     }
 
+    private HashSet<RotaryNode> findConnected(RotaryNode start) {
+        HashSet<RotaryNode> visited = new HashSet<>();
+        ArrayDeque<RotaryNode> cur = new ArrayDeque<>(graph.adjacentNodes(start));
+        ArrayDeque<RotaryNode> next = new ArrayDeque<>();
+        visited.add(start);
+        while(true) {
+            while(!cur.isEmpty()) {
+                RotaryNode n = cur.removeLast();
+                visited.add(n);
+                pathfind.remove(n);
+                for(RotaryNode child : graph.adjacentNodes(n)) {
+                    if(!visited.contains(child)) {next.push(child);}
+                }
+            }
+            if(next.isEmpty()) { break; }
+            ArrayDeque<RotaryNode> tmp = cur;
+            cur = next;
+            next = tmp;
+        }
+        return visited;
+    }
 }

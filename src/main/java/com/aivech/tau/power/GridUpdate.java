@@ -10,11 +10,15 @@ import java.util.Collection;
 
 public class GridUpdate {
     final GridAction action;
-    final RotaryNode node;
+    RotaryNode node;
+    BlockPos pos;
+    Direction dir;
 
-    private GridUpdate(GridAction action, RotaryNode node) {
+    private GridUpdate(GridAction action, RotaryNode node, BlockPos pos, Direction dir) {
         this.node = node;
         this.action = action;
+        this.pos = pos;
+        this.dir = dir;
     }
 
     public static void add(IRotaryBlock block, World world, BlockPos blockPos, Direction orient, Collection<Direction> connectsTo) {
@@ -28,12 +32,20 @@ public class GridUpdate {
         }
         RotaryNode node = new RotaryNode(RotaryNode.NodeType.SINK, blockPos, orient, connectsTo);
 
-        RotaryGrid.UPDATE_QUEUES.get(DimensionType.getId(world.getDimension().getType())).add(new GridUpdate(GridAction.ADD,node));
+        RotaryGrid.UPDATE_QUEUES.get(DimensionType.getId(world.getDimension().getType())).add(new GridUpdate(GridAction.ADD,node,null,null));
     }
 
     // convenience method because Direction.ALL is an array
     public static void add(IRotaryBlock block, World world, BlockPos blockPos, Direction orient, Direction[] connectsTo) {
         add(block, world, blockPos, orient, Arrays.asList(connectsTo));
+    }
+
+    public static void remove(World world, BlockPos pos, Direction orient) {
+        RotaryGrid.UPDATE_QUEUES.get(DimensionType.getId(world.getDimension().getType())).add(new GridUpdate(GridAction.ADD,null,pos,orient));
+    }
+
+    public static void removeAll(World world, BlockPos pos) {
+        remove(world,pos,null);
     }
 
     enum GridAction {
