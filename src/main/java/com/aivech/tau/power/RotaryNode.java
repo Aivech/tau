@@ -35,6 +35,8 @@ public class RotaryNode {
         SOURCE, SINK, PATH, JUNCTION, CLUTCH, MUTATE
     }
 
+
+
     static class Junction extends RotaryNode {
         final boolean merge;
         Junction(NodeType type, BlockPos pos, Direction dir, Collection<Direction> connectsTo, boolean merge) {

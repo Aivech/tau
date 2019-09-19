@@ -1,5 +1,6 @@
 package com.aivech.tau.power;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
 public class RotaryPath {

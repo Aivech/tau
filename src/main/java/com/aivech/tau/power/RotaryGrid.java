@@ -218,6 +218,8 @@ public class RotaryGrid extends Thread {
                             break;
                         }
                         path.append(children.pollFirst());
+
+                        //create new paths at junctions
                         while(!children.isEmpty()) {
                             RotaryPath branch = path.copy();
                             branch.append(children.pollFirst());
@@ -226,10 +228,11 @@ public class RotaryGrid extends Thread {
                     }
                 }
             }
+
+            // cache paths on the nodes
             for(RotaryPath path : paths) {
                 for(RotaryNode node : path.nodeSet) {
                     node.paths.add(path);
-
                 }
             }
         }
