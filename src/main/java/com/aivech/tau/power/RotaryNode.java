@@ -18,13 +18,13 @@ public class RotaryNode {
 
     final BlockPos pos;
     final NodeType type;
-    final Direction dir;
+    final Direction orient;
     final HashSet<Direction> connects;
 
-    RotaryNode(NodeType type, BlockPos pos, Direction dir, Collection<Direction> connectsTo) {
+    RotaryNode(NodeType type, BlockPos pos, Direction orient, Collection<Direction> connectsTo) {
         this.type = type;
         this.pos = pos;
-        this.dir = dir;
+        this.orient = orient;
         this.connects = new HashSet<>(connectsTo);
     }
 
@@ -53,6 +53,9 @@ public class RotaryNode {
             super(NodeType.SOURCE, pos, dir, connectsTo);
         }
 
+        int getFractionalTorque() {
+            return torque / paths.size();
+        }
     }
 
     static class Clutch extends RotaryNode {
@@ -93,6 +96,7 @@ public class RotaryNode {
 
         @Override
         void handleTransaction(GridTransaction t) {
+            if (torqueFactor * speedFactor == 0) return;
             t.torqueFactor *= torqueFactor;
             t.speedFactor *= speedFactor;
             t.torqueFactor /= speedFactor;
@@ -116,11 +120,11 @@ public class RotaryNode {
             Tau.Log.debug("Neighbor is " + toNeighbor.toString());
             if (neighbor instanceof Junction) {
                 Junction junc = (Junction)neighbor;
-                if (junc.connects.contains(dir.getOpposite()) && junc.merge == (junc.dir != dir.getOpposite())) {
-                    return this.merge == (this.dir == toNeighbor);
+                if (junc.connects.contains(orient.getOpposite()) && junc.merge == (junc.orient != orient.getOpposite())) {
+                    return this.merge == (this.orient == toNeighbor);
                 }
             }
-            return this.merge == (this.dir == toNeighbor) && neighbor.connects.contains(toNeighbor.getOpposite());
+            return this.merge == (this.orient == toNeighbor) && neighbor.connects.contains(toNeighbor.getOpposite());
         }
 
 
@@ -134,13 +138,13 @@ public class RotaryNode {
         }
         if (o instanceof RotaryNode) {
             RotaryNode node = (RotaryNode)o;
-            return (node.pos.equals(this.pos)) && (node.type == this.type) && (node.dir == this.dir);
+            return (node.pos.equals(this.pos)) && (node.type == this.type) && (node.orient == this.orient);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return pos.getY() << 24 + pos.getX() << 14 + pos.getZ() << 4 + (this.type.ordinal() ^ this.dir.ordinal());
+        return pos.getY() << 24 + pos.getX() << 14 + pos.getZ() << 4 + (this.type.ordinal() ^ this.orient.ordinal());
     }
 }

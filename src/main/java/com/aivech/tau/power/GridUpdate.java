@@ -41,7 +41,7 @@ public class GridUpdate {
 
         Identifier id = DimensionType.getId(world.getDimension().getType());
 
-        RotaryGrid.UPDATE_QUEUES.get(id).add(new GridUpdate(UpdateAction.ADD, node, null, null));
+        RotaryGrid.GRID_UPDATE_QUEUES.get(id).add(new GridUpdate(UpdateAction.ADD, node, null, null));
         Object lock = RotaryGrid.LOCK_OBJECTS.get(id);
         synchronized (lock) {
             lock.notifyAll();
@@ -55,7 +55,7 @@ public class GridUpdate {
 
     public static void remove(World world, BlockPos pos, Direction orient) {
         Identifier id = DimensionType.getId(world.getDimension().getType());
-        RotaryGrid.UPDATE_QUEUES.get(id).add(new GridUpdate(UpdateAction.ADD, null, pos, orient));
+        RotaryGrid.GRID_UPDATE_QUEUES.get(id).add(new GridUpdate(UpdateAction.ADD, null, pos, orient));
         Object lock = RotaryGrid.LOCK_OBJECTS.get(id);
         synchronized (lock) {
             lock.notifyAll();
@@ -68,7 +68,7 @@ public class GridUpdate {
 
     public static void update(World world, BlockPos pos, Direction orient) {
         Identifier id = DimensionType.getId(world.getDimension().getType());
-        RotaryGrid.UPDATE_QUEUES.get(id).add(new GridUpdate(UpdateAction.UPDATE, null, pos, orient));
+        RotaryGrid.GRID_UPDATE_QUEUES.get(id).add(new GridUpdate(UpdateAction.UPDATE, null, pos, orient));
         Object lock = RotaryGrid.LOCK_OBJECTS.get(id);
         synchronized (lock) {
             lock.notifyAll();
