@@ -5,8 +5,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 
 public class RotaryNode {
 
@@ -30,6 +31,8 @@ public class RotaryNode {
     boolean canPathTo(RotaryNode neighbor) {
         return true;
     }
+
+
 
     public enum NodeType {
         SOURCE, SINK, PATH, JUNCTION, CLUTCH, TRANSFORM
