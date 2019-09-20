@@ -1,6 +1,5 @@
 package com.aivech.tau.power;
 
-import com.aivech.tau.power.RotaryNode.NodeType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -26,9 +25,9 @@ public class GridUpdate {
     public static void add(IRotaryBlock block, World world, BlockPos blockPos, Direction orient, Collection<Direction> connectsTo) {
         RotaryNode node;
         if (block instanceof IRotaryUser) {
-            node = new RotaryNode(NodeType.SINK, blockPos, orient, connectsTo);
+            node = new RotaryNode(blockPos, orient, connectsTo);
         } else if (block instanceof IRotaryProvider) {
-            node = new RotaryNode.Source(blockPos, orient, connectsTo);
+            node = new RotaryNode.Source(orient, connectsTo);
         } else if (block instanceof IRotaryTransform) {
             IRotaryTransform xform = (IRotaryTransform)block;
             node = new RotaryNode.Transform(blockPos, orient, connectsTo, xform.getTorqueFactor().get(), xform.getSpeedFactor().get());
@@ -36,7 +35,7 @@ public class GridUpdate {
             IRotaryClutch clutch = (IRotaryClutch)block;
             node = new RotaryNode.Clutch(blockPos, orient, connectsTo, clutch.isEngaged().get());
         } else {
-            node = new RotaryNode(NodeType.PATH, blockPos, orient, connectsTo);
+            node = new RotaryNode(blockPos, orient, connectsTo);
         }
 
         Identifier id = DimensionType.getId(world.getDimension().getType());

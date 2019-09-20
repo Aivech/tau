@@ -7,14 +7,23 @@ import net.minecraft.util.math.Vec3i;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class RotaryNode {
+public abstract class RotaryNode {
 
     /**
-     * touch this and die in CME hell
+     * touch these and die in CME hell
      **/
     final ArrayList<RotaryPath> paths = new ArrayList<>();
+    final HashMap<RotaryPath, NodePowerValues> pathPowerMap = new HashMap<>();
+
+    int torqueIn;
+    int speedIn;
+    int torqueOut;
+    int speedOut;
 
     final BlockPos pos;
     final NodeType type;
@@ -32,9 +41,19 @@ public class RotaryNode {
         return true;
     }
 
-    void handleTransaction(GridTransaction t) {
+    boolean handleTransaction(GridTransaction t) {
+        return false;
+    }
+
+    void addPathInputPower(GridTransaction trans, Source source) {
 
     }
+
+    abstract void addPathOutputPower(GridTransaction trans, Source source);
+
+    abstract void updateNode();
+
+    abstract void updateBlock();
 
     static class GridTransaction {
         int torqueFactor = 1;
@@ -46,36 +65,55 @@ public class RotaryNode {
     }
 
     static class Source extends RotaryNode {
-        int speed;
-        int torque;
+        private final AtomicInteger blockSpeed;
+        private final AtomicInteger blockTorque;
 
-        Source(BlockPos pos, Direction dir, Collection<Direction> connectsTo) {
+
+        Source(BlockPos pos, Direction dir, Collection<Direction> connectsTo, AtomicInteger torque, AtomicInteger speed) {
             super(NodeType.SOURCE, pos, dir, connectsTo);
+            this.blockTorque = torque;
+            this.blockSpeed = speed;
+        }
+
+        @Override
+        void addPathInputPower(GridTransaction trans, Source source) {
+        }
+
+        @Override
+        void addPathOutputPower(GridTransaction trans, Source source) {
+        }
+
+        @Override
+        void updateNode() {
+            this.speedOut = blockSpeed.get();
+            this.torqueOut = blockTorque.get();
+        }
+
+        @Override
+        void updateBlock() {
         }
 
         int getFractionalTorque() {
-            return torque / paths.size();
+            return torqueOut / paths.size();
         }
     }
 
     static class Clutch extends RotaryNode {
-        private boolean engaged;
+        private AtomicBoolean blockEngaged;
+        private boolean engaged = false;
 
-        Clutch(BlockPos pos, Direction dir, Collection<Direction> connectsTo, boolean engaged) {
+        Clutch(IRotaryBlock block, BlockPos pos, Direction dir, Collection<Direction> connectsTo, AtomicBoolean blockEngaged) {
             super(NodeType.CLUTCH, pos, dir, connectsTo);
-            this.engaged = engaged;
-        }
-
-        public void update(boolean engaged) {
-            this.engaged = engaged;
+            this.blockEngaged = blockEngaged;
         }
 
         @Override
-        void handleTransaction(GridTransaction t) {
+        boolean handleTransaction(GridTransaction t) {
             if (! engaged) {
                 t.torqueFactor *= 0;
                 t.speedFactor *= 0;
             }
+            return true;
         }
     }
 
@@ -83,13 +121,8 @@ public class RotaryNode {
         private int torqueFactor;
         private int speedFactor;
 
-        Transform(BlockPos pos, Direction dir, Collection<Direction> connectsTo, int torqueFactor, int speedFactor) {
+        Transform(IRotaryBlock block, BlockPos pos, Direction dir, Collection<Direction> connectsTo, int torqueFactor, int speedFactor) {
             super(NodeType.TRANSFORM, pos, dir, connectsTo);
-            this.torqueFactor = torqueFactor;
-            this.speedFactor = speedFactor;
-        }
-
-        public void update(int torqueFactor, int speedFactor) {
             this.torqueFactor = torqueFactor;
             this.speedFactor = speedFactor;
         }
@@ -108,7 +141,7 @@ public class RotaryNode {
     static class Junction extends RotaryNode {
         final boolean merge;
 
-        Junction(BlockPos pos, Direction dir, Collection<Direction> connectsTo, boolean merge) {
+        Junction(IRotaryBlock block, BlockPos pos, Direction dir, Collection<Direction> connectsTo, boolean merge) {
             super(NodeType.JUNCTION, pos, dir, connectsTo);
             this.merge = merge;
         }
@@ -128,6 +161,23 @@ public class RotaryNode {
         }
 
 
+    }
+
+    private static class NodePowerValues {
+        private int torqueIn = 0;
+        private int speedIn = 0;
+        private int torqueOut = 0;
+        private int speedOut = 0;
+
+        void setInputs(int torqueIn, int speedIn) {
+            this.torqueIn = torqueIn;
+            this.speedIn = speedIn;
+        }
+
+        void setOutputs(int torqueOut, int speedOut) {
+            this.torqueOut = torqueOut;
+            this.speedOut = speedOut;
+        }
     }
 
 
