@@ -28,7 +28,7 @@ public class RotaryGrid extends Thread {
 
 
     private final HashMultimap<BlockPos, RotaryNode> blockPosToNodeMap = HashMultimap.create();
-    private final HashSet<RotaryNode> sourceCache = new HashSet<>();
+    private final HashSet<RotaryNode.Source> sourceCache = new HashSet<>();
     private final HashSet<RotaryNode> sinkCache = new HashSet<>();
     private final HashMap<RotaryPath, Subgrid> subgridCache = new HashMap<>();
 
@@ -91,7 +91,7 @@ public class RotaryGrid extends Thread {
                 sinkCache.add(node);
                 break;
             case SOURCE :
-                sourceCache.add(node);
+                sourceCache.add((RotaryNode.Source)node);
                 pathfindQueue.add(node);
                 break;
             case PATH : break;
@@ -154,7 +154,7 @@ public class RotaryGrid extends Thread {
 
     private void invalidatePaths(RotaryNode node) {
         for(RotaryPath path : node.paths) {
-            pathfindQueue.add(path.firstNode);
+            pathfindQueue.add(path.source);
             for(RotaryNode n : path.nodeSet) {
                 if(!n.equals(node))
                     updateQueue.addAll(n.paths);
@@ -208,19 +208,19 @@ public class RotaryGrid extends Thread {
 
     private class Subgrid {
         private HashSet<RotaryNode> nodes;
-        private ArrayList<RotaryNode> roots = new ArrayList<>();
+        private ArrayList<RotaryNode.Source> roots = new ArrayList<>();
         private ArrayList<RotaryPath> paths = new ArrayList<>();
 
         private Subgrid(HashSet<RotaryNode> nodes) {
             this.nodes = nodes;
             for(RotaryNode n : nodes) {
                 if (sourceCache.contains(n))
-                    roots.add(n);
+                    roots.add((RotaryNode.Source)n);
             }
         }
 
         private void solve() {
-            for(RotaryNode source : roots) {
+            for (RotaryNode.Source source : roots) {
                 RotaryPath first = new RotaryPath(source);
                 ArrayDeque<RotaryPath> next = new ArrayDeque<>();
                 next.addLast(first);

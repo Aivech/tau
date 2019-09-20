@@ -3,17 +3,17 @@ package com.aivech.tau.power;
 import java.util.LinkedHashSet;
 
 public class RotaryPath {
-    final RotaryNode.Source firstNode;
+    final RotaryNode.Source source;
     final LinkedHashSet<RotaryNode> nodeSet = new LinkedHashSet<>();
     private RotaryNode lastNode;
 
     RotaryPath(RotaryNode.Source n) {
-        firstNode = n;
+        source = n;
         lastNode = n;
     }
 
     RotaryPath copy() {
-        RotaryPath copy = new RotaryPath(this.firstNode);
+        RotaryPath copy = new RotaryPath(this.source);
         for(RotaryNode node : nodeSet) {
             copy.append(node);
         }
@@ -35,7 +35,7 @@ public class RotaryPath {
 
     @Override
     public int hashCode() {
-        return firstNode.hashCode() ^ lastNode.hashCode();
+        return source.hashCode() ^ lastNode.hashCode();
     }
 
     @Override
