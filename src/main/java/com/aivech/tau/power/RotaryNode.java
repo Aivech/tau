@@ -32,9 +32,16 @@ public class RotaryNode {
         return true;
     }
 
+    void handleTransaction(GridTransaction t) {
 
+    }
 
-    public enum NodeType {
+    static class GridTransaction {
+        int torqueFactor;
+        int speedFactor;
+    }
+
+    enum NodeType {
         SOURCE, SINK, PATH, JUNCTION, CLUTCH, TRANSFORM
     }
 
@@ -47,6 +54,14 @@ public class RotaryNode {
 
         public void update(boolean engaged) {
             this.engaged = engaged;
+        }
+
+        @Override
+        void handleTransaction(GridTransaction t) {
+            if (! engaged) {
+                t.torqueFactor *= 0;
+                t.speedFactor *= 0;
+            }
         }
     }
 
@@ -62,6 +77,14 @@ public class RotaryNode {
         public void update(int torqueFactor, int speedFactor) {
             this.torqueFactor = torqueFactor;
             this.speedFactor = speedFactor;
+        }
+
+        @Override
+        void handleTransaction(GridTransaction t) {
+            t.torqueFactor *= torqueFactor;
+            t.speedFactor *= speedFactor;
+            t.torqueFactor /= speedFactor;
+            t.speedFactor /= torqueFactor;
         }
     }
 
