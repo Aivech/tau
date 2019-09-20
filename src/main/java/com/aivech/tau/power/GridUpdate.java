@@ -30,7 +30,11 @@ public class GridUpdate {
         } else if (block instanceof IRotaryProvider) {
             node = new RotaryNode.Source(blockPos, orient, connectsTo);
         } else if (block instanceof IRotaryTransform) {
-
+            IRotaryTransform xform = (IRotaryTransform)block;
+            node = new RotaryNode.Transform(blockPos, orient, connectsTo, xform.getTorqueFactor().get(), xform.getSpeedFactor().get());
+        } else if (block instanceof IRotaryClutch) {
+            IRotaryClutch clutch = (IRotaryClutch)block;
+            node = new RotaryNode.Clutch(blockPos, orient, connectsTo, clutch.isEngaged().get());
         } else {
             node = new RotaryNode(NodeType.PATH, blockPos, orient, connectsTo);
         }
