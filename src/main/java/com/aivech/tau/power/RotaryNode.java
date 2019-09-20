@@ -32,15 +32,41 @@ public class RotaryNode {
     }
 
     public enum NodeType {
-        SOURCE, SINK, PATH, JUNCTION, CLUTCH, MUTATE
+        SOURCE, SINK, PATH, JUNCTION, CLUTCH, TRANSFORM
     }
 
+    static class Clutch extends RotaryNode {
+        private boolean engaged;
+        Clutch(BlockPos pos, Direction dir, Collection<Direction> connectsTo,boolean engaged){
+            super(NodeType.CLUTCH,pos,dir,connectsTo);
+            this.engaged = engaged;
+        }
+
+        public void update(boolean engaged) {
+            this.engaged = engaged;
+        }
+    }
+
+    static class Transform extends RotaryNode {
+        private int torqueFactor;
+        private int speedFactor;
+        Transform(BlockPos pos, Direction dir, Collection<Direction> connectsTo, int torqueFactor, int speedFactor) {
+            super(NodeType.TRANSFORM,pos,dir,connectsTo);
+            this.torqueFactor = torqueFactor;
+            this.speedFactor = speedFactor;
+        }
+
+        public void update(int torqueFactor, int speedFactor) {
+            this.torqueFactor = torqueFactor;
+            this.speedFactor = speedFactor;
+        }
+    }
 
 
     static class Junction extends RotaryNode {
         final boolean merge;
-        Junction(NodeType type, BlockPos pos, Direction dir, Collection<Direction> connectsTo, boolean merge) {
-            super(type,pos,dir,connectsTo);
+        Junction(BlockPos pos, Direction dir, Collection<Direction> connectsTo, boolean merge) {
+            super(NodeType.JUNCTION,pos,dir,connectsTo);
             this.merge = merge;
         }
 
