@@ -37,18 +37,29 @@ public class RotaryNode {
     }
 
     static class GridTransaction {
-        int torqueFactor;
-        int speedFactor;
+        int torqueFactor = 1;
+        int speedFactor = 1;
     }
 
     enum NodeType {
         SOURCE, SINK, PATH, JUNCTION, CLUTCH, TRANSFORM
     }
 
+    static class Source extends RotaryNode {
+        int speed;
+        int torque;
+
+        Source(BlockPos pos, Direction dir, Collection<Direction> connectsTo) {
+            super(NodeType.SOURCE, pos, dir, connectsTo);
+        }
+
+    }
+
     static class Clutch extends RotaryNode {
         private boolean engaged;
-        Clutch(BlockPos pos, Direction dir, Collection<Direction> connectsTo,boolean engaged){
-            super(NodeType.CLUTCH,pos,dir,connectsTo);
+
+        Clutch(BlockPos pos, Direction dir, Collection<Direction> connectsTo, boolean engaged) {
+            super(NodeType.CLUTCH, pos, dir, connectsTo);
             this.engaged = engaged;
         }
 
@@ -68,8 +79,9 @@ public class RotaryNode {
     static class Transform extends RotaryNode {
         private int torqueFactor;
         private int speedFactor;
+
         Transform(BlockPos pos, Direction dir, Collection<Direction> connectsTo, int torqueFactor, int speedFactor) {
-            super(NodeType.TRANSFORM,pos,dir,connectsTo);
+            super(NodeType.TRANSFORM, pos, dir, connectsTo);
             this.torqueFactor = torqueFactor;
             this.speedFactor = speedFactor;
         }
@@ -91,19 +103,20 @@ public class RotaryNode {
 
     static class Junction extends RotaryNode {
         final boolean merge;
+
         Junction(BlockPos pos, Direction dir, Collection<Direction> connectsTo, boolean merge) {
-            super(NodeType.JUNCTION,pos,dir,connectsTo);
+            super(NodeType.JUNCTION, pos, dir, connectsTo);
             this.merge = merge;
         }
 
         @Override
         boolean canPathTo(RotaryNode neighbor) {
             Vec3i offset = neighbor.pos.subtract(pos);
-            Direction toNeighbor = Direction.fromVector(offset.getX(), offset.getY(),offset.getZ());
-            Tau.Log.debug("Neighbor is "+toNeighbor.toString());
-            if(neighbor instanceof Junction) {
+            Direction toNeighbor = Direction.fromVector(offset.getX(), offset.getY(), offset.getZ());
+            Tau.Log.debug("Neighbor is " + toNeighbor.toString());
+            if (neighbor instanceof Junction) {
                 Junction junc = (Junction)neighbor;
-                if(junc.connects.contains(dir.getOpposite()) && junc.merge == (junc.dir != dir.getOpposite())) {
+                if (junc.connects.contains(dir.getOpposite()) && junc.merge == (junc.dir != dir.getOpposite())) {
                     return this.merge == (this.dir == toNeighbor);
                 }
             }
@@ -116,7 +129,9 @@ public class RotaryNode {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null) { return false; }
+        if (o == null) {
+            return false;
+        }
         if (o instanceof RotaryNode) {
             RotaryNode node = (RotaryNode)o;
             return (node.pos.equals(this.pos)) && (node.type == this.type) && (node.dir == this.dir);

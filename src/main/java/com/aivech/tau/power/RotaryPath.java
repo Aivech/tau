@@ -3,11 +3,11 @@ package com.aivech.tau.power;
 import java.util.LinkedHashSet;
 
 public class RotaryPath {
-    final RotaryNode firstNode;
+    final RotaryNode.Source firstNode;
     final LinkedHashSet<RotaryNode> nodeSet = new LinkedHashSet<>();
     private RotaryNode lastNode;
 
-    RotaryPath(RotaryNode n) {
+    RotaryPath(RotaryNode.Source n) {
         firstNode = n;
         lastNode = n;
     }

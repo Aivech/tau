@@ -3,6 +3,7 @@ package com.aivech.tau.power;
 import com.aivech.tau.Tau;
 import com.aivech.tau.event.WorldLoadCallback;
 import com.aivech.tau.event.WorldUnloadCallback;
+import com.aivech.tau.power.RotaryNode.GridTransaction;
 import com.google.common.collect.HashMultimap;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
@@ -29,9 +30,10 @@ public class RotaryGrid extends Thread {
     private final HashMultimap<BlockPos, RotaryNode> blockPosToNodeMap = HashMultimap.create();
     private final HashSet<RotaryNode> sourceCache = new HashSet<>();
     private final HashSet<RotaryNode> sinkCache = new HashSet<>();
+    private final HashMap<RotaryPath, Subgrid> subgridCache = new HashMap<>();
 
     private final HashSet<RotaryNode> pathfindQueue = new HashSet<>();
-    private final HashSet<RotaryNode> updateQueue = new HashSet<>();
+    private final HashSet<RotaryPath> updateQueue = new HashSet<>();
 
     public RotaryGrid(Identifier dimension) {
         graph = GraphBuilder.undirected().allowsSelfLoops(false).build();
@@ -60,20 +62,19 @@ public class RotaryGrid extends Thread {
                         }
                     }
 
-                    // Create subgrids for pathfinding
-                    ArrayList<MutableGraph<RotaryNode>> subgraphs = new ArrayList<>();
+                    // Pathfinding
                     for (RotaryNode node : pathfindQueue) {
                         pathfindQueue.remove(node);
                         if(graph.adjacentNodes(node).isEmpty()) continue;
-                        subgraphs.add(findSubgrid(node));
+                        Subgrid subgrid = new Subgrid(findConnected(node));
+                        subgrid.solve();
                     }
+
+                    // Calculate source to node transactions
+
                 }
             }
         } catch (InterruptedException e) {
-        } catch (ClassCastException e) {
-            Tau.Log.fatal("Invalid operation performed on the grid. If this happens, it means someone needs to stop abusing the API.");
-            Tau.Log.fatal("https://youtu.be/Zb67FzEmEcY?t=3");
-            throw(e);
         }
         Tau.Log.debug("Stopping grid worker thread for "+ this.id.toString());
         LOCK_OBJECTS.remove(id);
@@ -135,6 +136,7 @@ public class RotaryGrid extends Thread {
         }
     }
 
+    /* unused
     private MutableGraph<RotaryNode> findSubgrid(RotaryNode node) {
         MutableGraph<RotaryNode> subgraph = GraphBuilder.undirected().allowsSelfLoops(false).build();
         HashSet<RotaryNode> visited = findConnected(node);
@@ -146,7 +148,7 @@ public class RotaryGrid extends Thread {
         }
 
         return subgraph;
-    }
+    }*/
 
 
 
@@ -155,7 +157,7 @@ public class RotaryGrid extends Thread {
             pathfindQueue.add(path.firstNode);
             for(RotaryNode n : path.nodeSet) {
                 if(!n.equals(node))
-                    updateQueue.add(n);
+                    updateQueue.addAll(n.paths);
             }
         }
         node.paths.clear();
@@ -197,12 +199,19 @@ public class RotaryGrid extends Thread {
         return visited;
     }
 
-    private class RotarySubgrid {
+    private void performTransactions(RotaryPath path) {
+        GridTransaction trans = new GridTransaction();
+        for (RotaryNode n : path.nodeSet) {
+            n.handleTransaction(trans);
+        }
+    }
+
+    private class Subgrid {
         private HashSet<RotaryNode> nodes;
         private ArrayList<RotaryNode> roots = new ArrayList<>();
         private ArrayList<RotaryPath> paths = new ArrayList<>();
 
-        private RotarySubgrid(HashSet<RotaryNode> nodes) {
+        private Subgrid(HashSet<RotaryNode> nodes) {
             this.nodes = nodes;
             for(RotaryNode n : nodes) {
                 if (sourceCache.contains(n))
@@ -245,8 +254,9 @@ public class RotaryGrid extends Thread {
                 }
             }
 
-            // cache paths on the blockPosToNodeMap
+            // caching
             for(RotaryPath path : paths) {
+                subgridCache.put(path, this);
                 for(RotaryNode node : path.nodeSet) {
                     node.paths.add(path);
                 }
