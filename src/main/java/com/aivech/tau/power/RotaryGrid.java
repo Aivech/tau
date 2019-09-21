@@ -50,6 +50,7 @@ public class RotaryGrid extends Thread {
             synchronized(lock) {
                 while(!Thread.interrupted()) {
                     lock.wait();
+                    if (this.changeQueue.isEmpty()) continue;
 
                     // Resolve changeQueue
                     while (this.changeQueue.peek() != null) {
@@ -225,9 +226,7 @@ public class RotaryGrid extends Thread {
     private void performTransactions(RotaryPath path) {
         GridTransaction trans = new GridTransaction();
         for (RotaryNode n : path.nodeSet) {
-            n.addPathInputPower(trans, path.source);
-            n.handleTransaction(trans);
-            n.addPathOutputPower(trans, path.source);
+            n.handleTransaction(trans, path);
             worldUpdateQueue.add(n);
         }
     }
@@ -262,7 +261,8 @@ public class RotaryGrid extends Thread {
                         Set<RotaryNode> adjacent = graph.adjacentNodes(node);
                         ArrayDeque<RotaryNode> children  = new ArrayDeque<>();
                         for(RotaryNode neighbor : adjacent) {
-                            if (!path.contains(neighbor) && node.canPathTo(neighbor)) children.addLast(neighbor);
+                            if (! path.contains(neighbor) && neighbor.canReceivePowerFrom(node))
+                                children.addLast(neighbor);
                         }
                         if(children.isEmpty()) { // loop & deadend avoidance
                             paths.add(path);

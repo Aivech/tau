@@ -20,11 +20,6 @@ public abstract class RotaryNode {
     final ArrayList<RotaryPath> paths = new ArrayList<>();
     final HashMap<RotaryPath, NodePowerValues> pathPowerMap = new HashMap<>();
 
-    int torqueIn;
-    int speedIn;
-    int torqueOut;
-    int speedOut;
-
     final BlockPos pos;
     final NodeType type;
     final Direction orient;
@@ -37,22 +32,15 @@ public abstract class RotaryNode {
         this.connects = new HashSet<>(connectsTo);
     }
 
-    boolean canPathTo(RotaryNode neighbor) {
-        return true;
-    }
+    abstract boolean canReceivePowerFrom(RotaryNode neighbor);
 
-    boolean handleTransaction(GridTransaction t) {
-        return false;
-    }
+    // add fractional path power and update transformation
+    abstract void handleTransaction(GridTransaction trans, RotaryPath path);
 
-    void addPathInputPower(GridTransaction trans, Source source) {
-
-    }
-
-    abstract void addPathOutputPower(GridTransaction trans, Source source);
-
+    // pull new values from world
     abstract void updateNode();
 
+    // push new updates to world
     abstract void updateBlock();
 
     static class GridTransaction {
@@ -68,6 +56,8 @@ public abstract class RotaryNode {
         private final AtomicInteger blockSpeed;
         private final AtomicInteger blockTorque;
 
+        private int sourceTorque;
+        private int sourceSpeed;
 
         Source(BlockPos pos, Direction dir, Collection<Direction> connectsTo, AtomicInteger torque, AtomicInteger speed) {
             super(NodeType.SOURCE, pos, dir, connectsTo);
@@ -76,17 +66,18 @@ public abstract class RotaryNode {
         }
 
         @Override
-        void addPathInputPower(GridTransaction trans, Source source) {
+        void handleTransaction(GridTransaction trans, RotaryPath path) {
         }
 
         @Override
-        void addPathOutputPower(GridTransaction trans, Source source) {
+        boolean canReceivePowerFrom(RotaryNode neighbor) {
+            return false;
         }
 
         @Override
         void updateNode() {
-            this.speedOut = blockSpeed.get();
-            this.torqueOut = blockTorque.get();
+            this.sourceSpeed = blockSpeed.get();
+            this.sourceTorque = blockTorque.get();
         }
 
         @Override
@@ -94,26 +85,50 @@ public abstract class RotaryNode {
         }
 
         int getFractionalTorque() {
-            return torqueOut / paths.size();
+            return sourceTorque / paths.size();
         }
     }
 
     static class Clutch extends RotaryNode {
-        private AtomicBoolean blockEngaged;
+        private final AtomicBoolean blockEngaged;
         private boolean engaged = false;
 
-        Clutch(IRotaryBlock block, BlockPos pos, Direction dir, Collection<Direction> connectsTo, AtomicBoolean blockEngaged) {
+
+        Clutch(BlockPos pos, Direction dir, Collection<Direction> connectsTo, AtomicBoolean blockEngaged) {
             super(NodeType.CLUTCH, pos, dir, connectsTo);
             this.blockEngaged = blockEngaged;
         }
 
         @Override
-        boolean handleTransaction(GridTransaction t) {
-            if (! engaged) {
-                t.torqueFactor *= 0;
-                t.speedFactor *= 0;
+        void handleTransaction(GridTransaction t, RotaryPath path) {
+            if (t.torqueFactor * t.speedFactor == 0) {
+                pathPowerMap.put(path, NodePowerValues.ZERO);
+                return;
             }
+            int torqueIn = path.source.getFractionalTorque() * t.torqueFactor / t.speedFactor;
+            int speedIn = path.source.sourceSpeed * t.speedFactor / t.torqueFactor;
+            if (! engaged) {
+                t.torqueFactor = 0;
+                t.speedFactor = 0;
+                pathPowerMap.put(path, new NodePowerValues(torqueIn, speedIn, 0, 0));
+                return;
+            }
+            pathPowerMap.put(path, new NodePowerValues(torqueIn, speedIn, torqueIn, speedIn));
+        }
+
+        @Override
+        boolean canReceivePowerFrom(RotaryNode neighbor) {
             return true;
+        }
+
+        @Override
+        void updateNode() {
+            engaged = blockEngaged.get();
+        }
+
+        @Override
+        void updateBlock() {
+
         }
     }
 
@@ -128,12 +143,23 @@ public abstract class RotaryNode {
         }
 
         @Override
-        void handleTransaction(GridTransaction t) {
-            if (torqueFactor * speedFactor == 0) return;
+        void handleTransaction(GridTransaction t, RotaryPath path) {
+            if (t.torqueFactor * t.speedFactor == 0) {
+                pathPowerMap.put(path, NodePowerValues.ZERO);
+                return;
+            }
+            int inputTorque = path.source.getFractionalTorque() * t.torqueFactor / t.speedFactor;
+            int inputSpeed = path.source.sourceSpeed * t.speedFactor / t.speedFactor;
             t.torqueFactor *= torqueFactor;
             t.speedFactor *= speedFactor;
             t.torqueFactor /= speedFactor;
             t.speedFactor /= torqueFactor;
+            pathPowerMap.put(path, new GridTransaction(path.source.getFractionalTorque()))
+        }
+
+        @Override
+        boolean canReceivePowerFrom(RotaryNode neighbor) {
+            return true;
         }
     }
 
@@ -164,17 +190,16 @@ public abstract class RotaryNode {
     }
 
     private static class NodePowerValues {
-        private int torqueIn = 0;
-        private int speedIn = 0;
-        private int torqueOut = 0;
-        private int speedOut = 0;
+        static final NodePowerValues ZERO = new NodePowerValues(0, 0, 0, 0);
 
-        void setInputs(int torqueIn, int speedIn) {
+        private final int torqueIn;
+        private final int speedIn;
+        private final int torqueOut;
+        private final int speedOut;
+
+        private NodePowerValues(int torqueIn, int speedIn, int torqueOut, int speedOut) {
             this.torqueIn = torqueIn;
             this.speedIn = speedIn;
-        }
-
-        void setOutputs(int torqueOut, int speedOut) {
             this.torqueOut = torqueOut;
             this.speedOut = speedOut;
         }

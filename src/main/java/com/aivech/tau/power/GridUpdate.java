@@ -26,7 +26,7 @@ public class GridUpdate {
         RotaryNode node;
         if (block instanceof IRotaryUser) {
             node = new RotaryNode(blockPos, orient, connectsTo);
-        } else if (block instanceof IRotaryProvider) {
+        } else if (block instanceof IRotarySource) {
             node = new RotaryNode.Source(orient, connectsTo);
         } else if (block instanceof IRotaryTransform) {
             IRotaryTransform xform = (IRotaryTransform)block;
