@@ -25,17 +25,19 @@ public class GridUpdate {
     public static void add(IRotaryBlock block, World world, BlockPos blockPos, Direction orient, Collection<Direction> connectsTo) {
         RotaryNode node;
         if (block instanceof IRotaryUser) {
-            node = new RotaryNode(blockPos, orient, connectsTo);
+            node = new RotaryNode.Sink(blockPos, orient, connectsTo, block.getPowerVars());
         } else if (block instanceof IRotarySource) {
-            node = new RotaryNode.Source(orient, connectsTo);
+            node = new RotaryNode.Source(blockPos, orient, connectsTo, block.getPowerVars());
         } else if (block instanceof IRotaryTransform) {
             IRotaryTransform xform = (IRotaryTransform)block;
-            node = new RotaryNode.Transform(blockPos, orient, connectsTo, xform.getTorqueFactor().get(), xform.getSpeedFactor().get());
+            node = new RotaryNode.Transform(blockPos, orient, connectsTo, xform.getTorqueFactor(), xform.getSpeedFactor(), block.getPowerVars());
         } else if (block instanceof IRotaryClutch) {
             IRotaryClutch clutch = (IRotaryClutch)block;
-            node = new RotaryNode.Clutch(blockPos, orient, connectsTo, clutch.isEngaged().get());
+            node = new RotaryNode.Clutch(blockPos, orient, connectsTo, clutch.isEngaged(), block.getPowerVars());
+        } else if (block instanceof IRotaryJunction) {
+            node = new RotaryNode.Junction(blockPos, orient, connectsTo, ((IRotaryJunction)block).isMerge(), block.getPowerVars());
         } else {
-            node = new RotaryNode(blockPos, orient, connectsTo);
+            node = new RotaryNode.Path(blockPos, orient, connectsTo, block.getPowerVars());
         }
 
         Identifier id = DimensionType.getId(world.getDimension().getType());
@@ -62,7 +64,7 @@ public class GridUpdate {
     }
 
     public static void removeAll(World world, BlockPos pos) {
-        remove(world,pos,null);
+        remove(world, pos, null);
     }
 
     public static void update(World world, BlockPos pos, Direction orient) {

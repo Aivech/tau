@@ -1,6 +1,7 @@
 package com.aivech.tau.power;
 
 import com.aivech.tau.Tau;
+import com.aivech.tau.power.IRotaryBlock.BlockPowerValues;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
@@ -152,7 +153,7 @@ public abstract class RotaryNode {
         private int torqueFactor;
         private int speedFactor;
 
-        Transform(IRotaryBlock block, BlockPos pos, Direction dir, Collection<Direction> connectsTo, AtomicInteger torqueFactor, AtomicInteger speedFactor, BlockPowerValues values) {
+        Transform(BlockPos pos, Direction dir, Collection<Direction> connectsTo, AtomicInteger torqueFactor, AtomicInteger speedFactor, BlockPowerValues values) {
             super(NodeType.TRANSFORM, pos, dir, connectsTo, values);
             this.blockTorqueFactor = torqueFactor;
             this.blockSpeedFactor = speedFactor;
@@ -190,7 +191,7 @@ public abstract class RotaryNode {
     static class Junction extends RotaryNode {
         final boolean merge;
 
-        Junction(IRotaryBlock block, BlockPos pos, Direction dir, Collection<Direction> connectsTo, boolean merge, BlockPowerValues values) {
+        Junction(BlockPos pos, Direction dir, Collection<Direction> connectsTo, boolean merge, BlockPowerValues values) {
             super(NodeType.JUNCTION, pos, dir, connectsTo, values);
             this.merge = merge;
         }
@@ -304,28 +305,6 @@ public abstract class RotaryNode {
             this.speedOut = speedOut;
         }
     }
-
-    private static class BlockPowerValues {
-        private final AtomicInteger torqueIn;
-        private final AtomicInteger speedIn;
-        private final AtomicInteger torqueOut;
-        private final AtomicInteger speedOut;
-
-        public BlockPowerValues(AtomicInteger torqueIn, AtomicInteger speedIn, AtomicInteger torqueOut, AtomicInteger speedOut) {
-            this.torqueIn = torqueIn;
-            this.speedIn = speedIn;
-            this.torqueOut = torqueOut;
-            this.speedOut = speedOut;
-        }
-
-        private void update(int torqueIn, int speedIn, int torqueOut, int speedOut) {
-            this.torqueIn.set(torqueIn);
-            this.speedIn.set(speedIn);
-            this.torqueOut.set(torqueOut);
-            this.speedOut.set(speedOut);
-        }
-    }
-
 
     @Override
     public boolean equals(Object o) {
