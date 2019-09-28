@@ -41,11 +41,10 @@ public class GridUpdate {
         }
 
         Identifier id = DimensionType.getId(world.getDimension().getType());
-
-        RotaryGrid.GRID_UPDATE_QUEUES.get(id).add(new GridUpdate(UpdateAction.ADD, node, null, null));
-        Object lock = RotaryGrid.LOCK_OBJECTS.get(id);
-        synchronized (lock) {
-            lock.notifyAll();
+        RotaryGrid dimGrid = RotaryGrid.GRIDS.get(id);
+        dimGrid.changeQueue.add(new GridUpdate(UpdateAction.ADD, node, null, null));
+        synchronized (dimGrid.lock) {
+            dimGrid.lock.notifyAll();
         }
     }
 
@@ -56,10 +55,10 @@ public class GridUpdate {
 
     public static void remove(World world, BlockPos pos, Direction orient) {
         Identifier id = DimensionType.getId(world.getDimension().getType());
-        RotaryGrid.GRID_UPDATE_QUEUES.get(id).add(new GridUpdate(UpdateAction.ADD, null, pos, orient));
-        Object lock = RotaryGrid.LOCK_OBJECTS.get(id);
-        synchronized (lock) {
-            lock.notifyAll();
+        RotaryGrid dimGrid = RotaryGrid.GRIDS.get(id);
+        dimGrid.changeQueue.add(new GridUpdate(UpdateAction.ADD, null, pos, orient));
+        synchronized (dimGrid.lock) {
+            dimGrid.lock.notifyAll();
         }
     }
 
@@ -69,10 +68,10 @@ public class GridUpdate {
 
     public static void update(World world, BlockPos pos, Direction orient) {
         Identifier id = DimensionType.getId(world.getDimension().getType());
-        RotaryGrid.GRID_UPDATE_QUEUES.get(id).add(new GridUpdate(UpdateAction.UPDATE, null, pos, orient));
-        Object lock = RotaryGrid.LOCK_OBJECTS.get(id);
-        synchronized (lock) {
-            lock.notifyAll();
+        RotaryGrid dimGrid = RotaryGrid.GRIDS.get(id);
+        dimGrid.changeQueue.add(new GridUpdate(UpdateAction.UPDATE, null, pos, orient));
+        synchronized (dimGrid.lock) {
+            dimGrid.lock.notifyAll();
         }
     }
 

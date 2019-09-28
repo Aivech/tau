@@ -17,15 +17,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class RotaryGrid extends Thread {
-    static final HashMap<Identifier, ConcurrentLinkedQueue<GridUpdate>> GRID_UPDATE_QUEUES = new HashMap<>();
-    static final ConcurrentHashMap<Identifier, Object> LOCK_OBJECTS = new ConcurrentHashMap<>();
-    // public static final HashMap<Identifier, ConcurrentLinkedQueue<RotaryUpdate>> outputQueues = new HashMap<>();
-    private static final HashMap<Identifier,RotaryGrid> GRIDS = new HashMap<>();
+    static final ConcurrentHashMap<Identifier, RotaryGrid> GRIDS = new ConcurrentHashMap<>();
+
+    final Object lock;
+    final ConcurrentLinkedQueue<GridUpdate> changeQueue = new ConcurrentLinkedQueue<>();
 
     private final MutableGraph<RotaryNode> graph;
     private final Identifier id;
-    private final ConcurrentLinkedQueue<GridUpdate> changeQueue = new ConcurrentLinkedQueue<>();
-
 
     private final HashMultimap<BlockPos, RotaryNode> blockPosToNodeMap = HashMultimap.create();
     private final HashSet<RotaryNode.Source> sourceCache = new HashSet<>();
@@ -36,28 +34,31 @@ public class RotaryGrid extends Thread {
     private final ArrayDeque<RotaryNode> nodeUpdateQueue = new ArrayDeque<>();
     private final ArrayDeque<RotaryNode> worldUpdateQueue = new ArrayDeque<>();
 
-    public RotaryGrid(Identifier dimension) {
-        graph = GraphBuilder.undirected().allowsSelfLoops(false).build();
+    private RotaryGrid(Identifier dimension) {
+        this.graph = GraphBuilder.undirected().allowsSelfLoops(false).build();
         this.id = dimension;
+        this.lock = new Object();
     }
 
     @Override
     public void run() {
-        Tau.Log.debug("Starting grid worker thread for "+this.id.toString());
-        Object lock = new Object();
-        LOCK_OBJECTS.put(this.id, lock);
+        Tau.Log.debug("Starting grid worker thread for " + this.id.toString());
         try {
-            synchronized(lock) {
-                while(!Thread.interrupted()) {
+            synchronized (lock) {
+                while (! Thread.interrupted()) {
                     lock.wait();
                     if (this.changeQueue.isEmpty()) continue;
 
                     // Resolve changeQueue
                     while (this.changeQueue.peek() != null) {
                         GridUpdate update = changeQueue.poll();
-                        switch(update.action) {
-                            case ADD: add(update.node); break;
-                            case DEL: remove(update.pos,update.dir); break;
+                        switch (update.action) {
+                            case ADD:
+                                add(update.node);
+                                break;
+                            case DEL:
+                                remove(update.pos, update.dir);
+                                break;
                             case UPDATE:
                                 update(update.pos, update.dir);
                                 break;
@@ -66,9 +67,9 @@ public class RotaryGrid extends Thread {
 
                     // Pathfinding calc
                     ArrayList<Subgrid> subgrids = new ArrayList<>();
-                    for (RotaryNode node : pathfindQueue) {
+                    for (RotaryNode.Source node : pathfindQueue) {
                         pathfindQueue.remove(node);
-                        if(graph.adjacentNodes(node).isEmpty()) continue;
+                        if (graph.adjacentNodes(node).isEmpty()) continue;
                         Subgrid subgrid = new Subgrid(findConnected(node));
                         subgrid.solve();
                         subgrids.add(subgrid);
@@ -99,21 +100,19 @@ public class RotaryGrid extends Thread {
             }
         } catch (InterruptedException e) {
         }
-        Tau.Log.debug("Stopping grid worker thread for "+ this.id.toString());
-        LOCK_OBJECTS.remove(id);
+        Tau.Log.debug("Stopping grid worker thread for " + this.id.toString());
         GRIDS.remove(id);
-        GRID_UPDATE_QUEUES.remove(id);
     }
 
     private void add(RotaryNode node) {
         // add to graph and caches
         graph.addNode(node);
         blockPosToNodeMap.put(node.pos, node);
-        switch(node.type) {
+        switch (node.type) {
             case SINK:
                 sinkCache.add(node);
                 break;
-            case SOURCE :
+            case SOURCE:
                 sourceCache.add((RotaryNode.Source)node);
                 pathfindQueue.add((RotaryNode.Source)node);
                 break;
@@ -125,10 +124,10 @@ public class RotaryGrid extends Thread {
         for (Direction dir : node.connects) {
             BlockPos offset = node.pos.offset(dir);
             Set<RotaryNode> connects = blockPosToNodeMap.get(offset);
-            if(connects != null) {
-                for(RotaryNode neighbor : connects) {
-                    if(neighbor.connects.contains(dir.getOpposite())) {
-                        graph.putEdge(node,neighbor);
+            if (connects != null) {
+                for (RotaryNode neighbor : connects) {
+                    if (neighbor.connects.contains(dir.getOpposite())) {
+                        graph.putEdge(node, neighbor);
 
                         this.invalidateSubgrid(node);
                     }
@@ -139,7 +138,7 @@ public class RotaryGrid extends Thread {
 
     private void remove(BlockPos pos, Direction dir) {
         Set<RotaryNode> removed = blockPosToNodeMap.get(pos);
-        for(RotaryNode node : removed) {
+        for (RotaryNode node : removed) {
             if (dir == null || node.orient == dir) {
 
                 this.invalidateSubgrid(node);
@@ -206,16 +205,21 @@ public class RotaryGrid extends Thread {
         ArrayDeque<RotaryNode> cur = new ArrayDeque<>(graph.adjacentNodes(start));
         ArrayDeque<RotaryNode> next = new ArrayDeque<>();
         visited.add(start);
-        while(true) {
-            while(!cur.isEmpty()) {
+        while (true) {
+            while (! cur.isEmpty()) {
                 RotaryNode n = cur.removeLast();
                 visited.add(n);
-                pathfindQueue.remove(n);
-                for(RotaryNode child : graph.adjacentNodes(n)) {
-                    if(!visited.contains(child)) {next.push(child);}
+                if (n instanceof RotaryNode.Source)
+                    pathfindQueue.remove(n);
+                for (RotaryNode child : graph.adjacentNodes(n)) {
+                    if (! visited.contains(child)) {
+                        next.push(child);
+                    }
                 }
             }
-            if(next.isEmpty()) { break; }
+            if (next.isEmpty()) {
+                break;
+            }
             ArrayDeque<RotaryNode> tmp = cur;
             cur = next;
             next = tmp;
@@ -238,8 +242,8 @@ public class RotaryGrid extends Thread {
 
         private Subgrid(HashSet<RotaryNode> nodes) {
             this.nodes = nodes;
-            for(RotaryNode n : nodes) {
-                if (sourceCache.contains(n))
+            for (RotaryNode n : nodes) {
+                if (n instanceof RotaryNode.Source && sourceCache.contains(n))
                     roots.add((RotaryNode.Source)n);
             }
         }
@@ -249,9 +253,9 @@ public class RotaryGrid extends Thread {
                 RotaryPath first = new RotaryPath(source);
                 ArrayDeque<RotaryPath> next = new ArrayDeque<>();
                 next.addLast(first);
-                while(!next.isEmpty()) {
+                while (! next.isEmpty()) {
                     RotaryPath path = next.pollFirst();
-                    while(true) {
+                    while (true) {
                         RotaryNode node = path.getLast();
                         int degree = graph.degree(node);
                         if (sinkCache.contains(node) || degree < 2) { // end of path
@@ -259,19 +263,19 @@ public class RotaryGrid extends Thread {
                             break;
                         }
                         Set<RotaryNode> adjacent = graph.adjacentNodes(node);
-                        ArrayDeque<RotaryNode> children  = new ArrayDeque<>();
-                        for(RotaryNode neighbor : adjacent) {
+                        ArrayDeque<RotaryNode> children = new ArrayDeque<>();
+                        for (RotaryNode neighbor : adjacent) {
                             if (! path.contains(neighbor) && neighbor.canReceivePowerFrom(node))
                                 children.addLast(neighbor);
                         }
-                        if(children.isEmpty()) { // loop & deadend avoidance
+                        if (children.isEmpty()) { // loop & deadend avoidance
                             paths.add(path);
                             break;
                         }
                         path.append(children.pollFirst());
 
                         //create new paths at junctions
-                        while(!children.isEmpty()) {
+                        while (! children.isEmpty()) {
                             RotaryPath branch = path.copy();
                             branch.append(children.pollFirst());
                             next.addLast(branch);
@@ -281,9 +285,9 @@ public class RotaryGrid extends Thread {
             }
 
             // caching
-            for(RotaryPath path : paths) {
+            for (RotaryPath path : paths) {
                 subgridCache.put(path, this);
-                for(RotaryNode node : path.nodeSet) {
+                for (RotaryNode node : path.nodeSet) {
                     node.paths.add(path);
                 }
             }
@@ -295,7 +299,6 @@ public class RotaryGrid extends Thread {
             Identifier dimId = DimensionType.getId(world.getDimension().getType());
             RotaryGrid grid = new RotaryGrid(dimId);
             GRIDS.put(dimId, grid);
-            GRID_UPDATE_QUEUES.put(dimId, grid.changeQueue);
             grid.start();
         }));
         WorldUnloadCallback.EVENT.register((world -> {
