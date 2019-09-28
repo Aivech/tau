@@ -171,21 +171,6 @@ public class RotaryGrid extends Thread {
         }
     }
 
-    /* unused
-    private MutableGraph<RotaryNode> findSubgrid(RotaryNode node) {
-        MutableGraph<RotaryNode> subgraph = GraphBuilder.undirected().allowsSelfLoops(false).build();
-        HashSet<RotaryNode> visited = findConnected(node);
-        for (RotaryNode n : visited) {
-            subgraph.addNode(n);
-            graph.adjacentNodes(n).forEach((child -> {
-                subgraph.putEdge(n,child);
-            }));
-        }
-
-        return subgraph;
-    }*/
-
-
     private void invalidateSubgrid(RotaryNode node) {
         Subgrid subgrid = subgridCache.get(node.paths.get(0));
         for (RotaryNode n : subgrid.nodes) {
