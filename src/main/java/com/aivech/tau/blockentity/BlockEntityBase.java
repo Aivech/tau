@@ -12,12 +12,11 @@ public abstract class BlockEntityBase extends BlockEntity {
 
     @Override
     public void validate() {
-        this.onAdd();
         super.validate();
     }
 
-    protected void onAdd() {
-        //Tau.Log.debug("Added BE @ "+this.pos.toString()+this.world.dimension.getType().toString());
+    public void onAdd() {
+        Tau.Log.debug("onAdd(): " + this.pos.toString() + " in " + this.world.dimension.getType().toString());
     }
 
     public void onRemove() {

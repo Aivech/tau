@@ -6,7 +6,8 @@
     "WorldLoadEvent$ServerLoadDimMixin",
     "WorldUnloadEvent",
     "BlockEntityRemoveEvent$WorldRemoveBEMixin",
-    "BlockEntityRemoveEvent$ServerWorldUnloadBEMixin"
+    "BlockEntityRemoveEvent$ServerWorldUnloadBEMixin",
+    "BlockEntityAddEvent$WorldMixin"
   ],
   "client": [
   ],
