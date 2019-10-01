@@ -16,7 +16,7 @@ public class BlockEntityAddEvent {
         @Inject(at = @At(value = "HEAD"), method = "addBlockEntity")
         private void tau_World_setBlockEntity_1(BlockEntity blockEntity_1, CallbackInfoReturnable<Boolean> cir) {
             if (! ((World)(Object)this).isClient() && blockEntity_1 instanceof BlockEntityBase) {
-                Tau.Log.debug("MIXIN-WORLD: Added BE" + blockEntity_1.getClass().toString() + " @ " + blockEntity_1.getClass().toString() + " in " + ((World)(Object)this).dimension.getType().toString());
+                Tau.Log.debug("MIXIN-WORLD: Added BE" + blockEntity_1.getClass().toString() + " @ " + blockEntity_1.getPos().toString() + " in " + ((World)(Object)this).dimension.getType().toString());
                 ((BlockEntityBase)blockEntity_1).onAdd();
             }
         }
