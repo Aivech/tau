@@ -1,21 +1,28 @@
 package com.aivech.tau.item;
 
-import com.aivech.tau.Tau;
+import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-import java.util.HashMap;
+import static com.aivech.tau.Tau.MODID;
 
 public class TauItems {
-    public static final HashMap<String, ItemBase> REGISTRY = new HashMap();
-
-    public static void register(ItemBase i) {
-        REGISTRY.put(i.id,i);
-        Registry.register(Registry.ITEM,new Identifier(Tau.MODID,i.id),i);
-    }
+    public static final ItemBase TEST_ITEM = createSimpleItem("testitem");
 
     public static void init() {
-        register(new ItemBase(new Item.Settings().group(Tau.ITEMS),"testitem"));
+        register(TEST_ITEM);
+    }
+
+    private static final ItemGroup ITEMS = FabricItemGroupBuilder.build(new Identifier(MODID, "items"), () -> new ItemStack(TauItems.TEST_ITEM));
+
+    private static ItemBase createSimpleItem(String id) {
+        return new ItemBase(new Item.Settings().group(ITEMS), id);
+    }
+
+    private static void register(ItemBase item) {
+        Registry.register(Registry.ITEM, item.id, item);
     }
 }

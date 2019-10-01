@@ -4,7 +4,9 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "WorldLoadEvent$ServerLoadDimMixin",
-    "WorldUnloadEvent"
+    "WorldUnloadEvent",
+    "BlockEntityRemoveEvent$WorldRemoveBEMixin",
+    "BlockEntityRemoveEvent$ServerWorldUnloadBEMixin"
   ],
   "client": [
   ],

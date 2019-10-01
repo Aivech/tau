@@ -1,32 +1,26 @@
 package com.aivech.tau.blockentity;
 
-import com.aivech.tau.Tau;
 import com.aivech.tau.block.BlockBase;
 import com.aivech.tau.block.TauBlocks;
+import com.aivech.tau.blockentity.power.BlockEntityShaft;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-import java.util.HashMap;
+import java.util.function.Supplier;
 
 public class TauBlockEntities {
-    public static final HashMap<String, BlockEntityType<BlockEntityBase>> REGISTRY = new HashMap<>();
+
+    public static BlockEntityType<BlockEntityShaft> SHAFT;
 
     public static void init() {
-        register(TauBlocks.REGISTRY.get("te_test"));
+        SHAFT = register(BlockEntityShaft::new, TauBlocks.SHAFT);
     }
 
-    public static void register(BlockBase b) {
-        TypeDelegate type = new TypeDelegate();
-        type.type = Registry.register(
+    private static BlockEntityType register(Supplier<BlockEntityShaft> c, BlockBase b) {
+        return Registry.register(
                 Registry.BLOCK_ENTITY,
-                new Identifier(Tau.MODID, b.id),
-                BlockEntityType.Builder.create(() -> new BlockEntityBase(type.type), b).build(null));
-        REGISTRY.put(b.id, type.type);
-
-    }
-
-    public static class TypeDelegate {
-        BlockEntityType<BlockEntityBase> type;
+                b.id,
+                new BlockEntityType<>(c, ImmutableSet.of(b), null));
     }
 }
