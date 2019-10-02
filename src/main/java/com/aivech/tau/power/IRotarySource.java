@@ -1,4 +1,4 @@
 package com.aivech.tau.power;
 
-public interface IRotarySource extends IRotaryBlock {
+public interface IRotarySource extends IRotaryBE {
 }

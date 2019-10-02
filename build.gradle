@@ -27,6 +27,9 @@ dependencies {
 	// You may need to force-disable transitiveness on them.
 
 	modCompile "io.github.cottonmc:LibGui:1.3.2"
+
+	//modImplementation 'com.github.Zundrel:Wrenchable:0.1.3'
+	//include 'com.github.Zundrel:Wrenchable:0.1.3'
 }
 
 repositories {
@@ -41,6 +44,9 @@ repositories {
 	maven {
 		name = "BuildCraft"
 		url = "http://mod-buildcraft.com/maven"
+	}
+	maven {
+		url = 'https://jitpack.io'
 	}
 }
 

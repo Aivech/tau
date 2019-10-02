@@ -5,10 +5,16 @@ import net.minecraft.util.math.Direction;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public interface IRotaryBlock {
+public interface IRotaryBE {
 
     BlockPowerValues getPowerVars();
 
+    /**
+     * Get all valid connection sides for this block, from all nodes.
+     * If the block contains more than one node, this <b>will not</b> be the same as the values passed to GridUpdate.add().
+     *
+     * @return The directions of all valid connection sides.
+     */
     Set<Direction> getValidConnections();
 
     class BlockPowerValues {

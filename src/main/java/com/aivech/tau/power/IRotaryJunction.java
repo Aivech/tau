@@ -1,5 +1,5 @@
 package com.aivech.tau.power;
 
-public interface IRotaryJunction {
+public interface IRotaryJunction extends IRotaryBE {
     boolean isMerge();
 }

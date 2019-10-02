@@ -16,7 +16,7 @@ public class TauItems {
         register(TEST_ITEM);
     }
 
-    private static final ItemGroup ITEMS = FabricItemGroupBuilder.build(new Identifier(MODID, "items"), () -> new ItemStack(TauItems.TEST_ITEM));
+    public static final ItemGroup ITEMS = FabricItemGroupBuilder.build(new Identifier(MODID, "items"), () -> new ItemStack(TauItems.TEST_ITEM));
 
     private static ItemBase createSimpleItem(String id) {
         return new ItemBase(new Item.Settings().group(ITEMS), id);

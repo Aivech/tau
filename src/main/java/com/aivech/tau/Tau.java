@@ -1,7 +1,7 @@
 package com.aivech.tau;
 
 import com.aivech.tau.block.TauBlocks;
-import com.aivech.tau.blockentity.TauBlockEntities;
+import com.aivech.tau.blockentity.TauBEs;
 import com.aivech.tau.item.TauItems;
 import com.aivech.tau.power.RotaryGrid;
 import net.fabricmc.api.ModInitializer;
@@ -18,13 +18,13 @@ public class Tau implements ModInitializer {
     @Override
     public void onInitialize() {
         log = LogManager.getLogger(MODID);
-        Log.info("Not Warhammer.");
+        Log.info("For the greater good.");
 
-        Configurator.setLevel("tau", Level.DEBUG);
+        Configurator.setLevel(MODID, Level.DEBUG);
 
         TauBlocks.init();
         TauItems.init();
-        TauBlockEntities.init();
+        TauBEs.init();
 
         RotaryGrid.registerHandlers();
     }

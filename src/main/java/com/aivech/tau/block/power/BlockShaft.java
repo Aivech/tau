@@ -3,8 +3,8 @@ package com.aivech.tau.block.power;
 import com.aivech.tau.Tau;
 import com.aivech.tau.block.BlockBase;
 import com.aivech.tau.block.IRotatable;
-import com.aivech.tau.blockentity.power.BlockEntityShaft;
-import com.aivech.tau.power.IRotaryBlock;
+import com.aivech.tau.blockentity.power.ShaftBE;
+import com.aivech.tau.power.IRotaryBE;
 import net.fabricmc.fabric.api.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -35,7 +35,7 @@ public class BlockShaft extends BlockBase implements BlockEntityProvider, IRotat
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockView var1) {
-        return new BlockEntityShaft();
+        return new ShaftBE();
     }
 
     @Override
@@ -55,7 +55,7 @@ public class BlockShaft extends BlockBase implements BlockEntityProvider, IRotat
                 throw new UnsupportedOperationException("Attempted to rotate a BlockShaft with invalid blockstate. This should never happen.");
         }
         world.setBlockState(pos, blockState.with(AXIS, axis));
-        BlockEntityShaft be = (BlockEntityShaft)world.getBlockEntity(pos);
+        ShaftBE be = (ShaftBE)world.getBlockEntity(pos);
         be.rotateTo(axis);
         return true;
     }
@@ -77,9 +77,11 @@ public class BlockShaft extends BlockBase implements BlockEntityProvider, IRotat
                 throw new UnsupportedOperationException("Attempted to rotate a BlockShaft with invalid blockstate. This should never happen.");
         }
         world.setBlockState(pos, blockState.with(AXIS, axis));
-        BlockEntityShaft be = (BlockEntityShaft)world.getBlockEntity(pos);
+        ShaftBE be = (ShaftBE)world.getBlockEntity(pos);
         be.rotateTo(axis);
         return true;
+
+        // BlockState$cycleProperty
     }
 
     @Override
@@ -97,9 +99,9 @@ public class BlockShaft extends BlockBase implements BlockEntityProvider, IRotat
         ArrayList<Direction> found = new ArrayList<>();
         for (Direction d : Direction.values()) {
             BlockEntity be = w.getBlockEntity(pos.offset(d));
-            if (be instanceof IRotaryBlock) {
+            if (be instanceof IRotaryBE) {
                 Tau.Log.debug(be.getClass().toString());
-                if (((IRotaryBlock)be).getValidConnections().contains(d.getOpposite())) {
+                if (((IRotaryBE)be).getValidConnections().contains(d.getOpposite())) {
                     if (d == dir)
                         return this.getDefaultState().with(AXIS, dir.getAxis());
                     found.add(d);

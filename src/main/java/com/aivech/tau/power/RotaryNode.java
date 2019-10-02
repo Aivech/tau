@@ -1,7 +1,7 @@
 package com.aivech.tau.power;
 
 import com.aivech.tau.Tau;
-import com.aivech.tau.power.IRotaryBlock.BlockPowerValues;
+import com.aivech.tau.power.IRotaryBE.BlockPowerValues;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;

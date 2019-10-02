@@ -2,6 +2,7 @@ package com.aivech.tau.block;
 
 import com.aivech.tau.Tau;
 import com.aivech.tau.block.power.BlockShaft;
+import com.aivech.tau.block.power.DebugEngineBlock;
 import net.fabricmc.fabric.api.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.minecraft.block.Material;
@@ -15,6 +16,7 @@ import net.minecraft.util.registry.Registry;
 public class TauBlocks {
     public static BlockBase TEST_BLOCK = createSimpleBlock(Material.STONE, "testblock");
     public static BlockShaft SHAFT = new BlockShaft();
+    public static DebugEngineBlock DEBUG_ENGINE = new DebugEngineBlock();
 
     public static final ItemGroup BLOCKS = FabricItemGroupBuilder.build(new Identifier(Tau.MODID, "blocks"), () -> new ItemStack(TEST_BLOCK));
 

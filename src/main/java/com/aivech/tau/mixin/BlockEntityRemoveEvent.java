@@ -1,7 +1,7 @@
 package com.aivech.tau.mixin;
 
 import com.aivech.tau.Tau;
-import com.aivech.tau.blockentity.BlockEntityBase;
+import com.aivech.tau.blockentity.IAddRemoveNotifiable;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -23,9 +23,9 @@ public class BlockEntityRemoveEvent {
             World w = (World)(Object)this;
             if (! w.isClient()) {
                 BlockEntity be = w.getBlockEntity(pos);
-                if (be instanceof BlockEntityBase) {
+                if (be instanceof IAddRemoveNotifiable) {
                     Tau.Log.debug("MIXIN-WORLD: Removed BE" + be.getClass().toString() + " @ " + pos.toString() + " in " + ((World)(Object)this).dimension.getType().toString());
-                    ((BlockEntityBase)be).onRemove();
+                    ((IAddRemoveNotifiable)be).onRemove();
                 }
 
             }
@@ -40,8 +40,10 @@ public class BlockEntityRemoveEvent {
                 method = "unloadEntities")
         private void tau_ServerWorld_removeBlockEntity(WorldChunk worldChunk_1, CallbackInfo ci) {
             worldChunk_1.getBlockEntities().values().forEach((blockEntity -> {
-                if (blockEntity instanceof BlockEntityBase)
+                if (blockEntity instanceof IAddRemoveNotifiable) {
                     Tau.Log.debug("MIXIN-SERVERWORLD: Removed BE" + blockEntity.getClass().toString() + " @ " + blockEntity.getPos().toString() + ((World)(Object)this).dimension.getType().toString());
+                    ((IAddRemoveNotifiable)blockEntity).onRemove();
+                }
             }));
         }
     }

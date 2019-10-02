@@ -38,6 +38,7 @@ public class RotaryGrid extends Thread {
         this.graph = GraphBuilder.undirected().allowsSelfLoops(false).build();
         this.id = dimension;
         this.lock = new Object();
+        this.setName(Tau.MODID + "worker:" + id.getPath());
     }
 
     @Override
@@ -172,6 +173,7 @@ public class RotaryGrid extends Thread {
     }
 
     private void invalidateSubgrid(RotaryNode node) {
+        if (node.paths.size() == 0) return;
         Subgrid subgrid = subgridCache.get(node.paths.get(0));
         for (RotaryNode n : subgrid.nodes) {
             worldUpdateQueue.add(n);

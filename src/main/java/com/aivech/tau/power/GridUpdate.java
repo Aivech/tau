@@ -22,7 +22,7 @@ public class GridUpdate {
         this.dir = dir;
     }
 
-    public static void add(IRotaryBlock block, World world, BlockPos blockPos, Direction orient, Collection<Direction> connectsTo) {
+    public static void add(IRotaryBE block, World world, BlockPos blockPos, Direction orient, Collection<Direction> connectsTo) {
         RotaryNode node;
         if (block instanceof IRotaryUser) {
             node = new RotaryNode.Sink(blockPos, orient, connectsTo, block.getPowerVars());
@@ -49,14 +49,14 @@ public class GridUpdate {
     }
 
     // convenience method because Direction.ALL is an array
-    public static void add(IRotaryBlock block, World world, BlockPos blockPos, Direction orient, Direction[] connectsTo) {
+    public static void add(IRotaryBE block, World world, BlockPos blockPos, Direction orient, Direction[] connectsTo) {
         add(block, world, blockPos, orient, Arrays.asList(connectsTo));
     }
 
     public static void remove(World world, BlockPos pos, Direction orient) {
         Identifier id = DimensionType.getId(world.getDimension().getType());
         RotaryGrid dimGrid = RotaryGrid.GRIDS.get(id);
-        dimGrid.changeQueue.add(new GridUpdate(UpdateAction.ADD, null, pos, orient));
+        dimGrid.changeQueue.add(new GridUpdate(UpdateAction.DEL, null, pos, orient));
         synchronized (dimGrid.lock) {
             dimGrid.lock.notifyAll();
         }

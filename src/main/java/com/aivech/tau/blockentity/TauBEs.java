@@ -2,22 +2,25 @@ package com.aivech.tau.blockentity;
 
 import com.aivech.tau.block.BlockBase;
 import com.aivech.tau.block.TauBlocks;
-import com.aivech.tau.blockentity.power.BlockEntityShaft;
+import com.aivech.tau.blockentity.power.ShaftBE;
+import com.aivech.tau.blockentity.power.engine.DebugEngineBE;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.util.registry.Registry;
 
 import java.util.function.Supplier;
 
-public class TauBlockEntities {
+public class TauBEs {
 
-    public static BlockEntityType<BlockEntityShaft> SHAFT;
+    public static BlockEntityType<ShaftBE> SHAFT;
+    public static BlockEntityType<DebugEngineBE> DEBUG_ENGINE;
 
     public static void init() {
-        SHAFT = register(BlockEntityShaft::new, TauBlocks.SHAFT);
+        SHAFT = register(ShaftBE::new, TauBlocks.SHAFT);
+        DEBUG_ENGINE = register(DebugEngineBE::new, TauBlocks.DEBUG_ENGINE);
     }
 
-    private static BlockEntityType register(Supplier<BlockEntityShaft> c, BlockBase b) {
+    private static BlockEntityType register(Supplier<BaseBE> c, BlockBase b) {
         return Registry.register(
                 Registry.BLOCK_ENTITY,
                 b.id,
