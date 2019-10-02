@@ -11,9 +11,11 @@ import static com.aivech.tau.Tau.MODID;
 
 public class TauItems {
     public static final ItemBase TEST_ITEM = createSimpleItem("testitem");
+    public static final ItemWrench WRENCH = new ItemWrench();
 
     public static void init() {
         register(TEST_ITEM);
+        register(WRENCH);
     }
 
     public static final ItemGroup ITEMS = FabricItemGroupBuilder.build(new Identifier(MODID, "items"), () -> new ItemStack(TauItems.TEST_ITEM));

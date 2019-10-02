@@ -1,6 +1,5 @@
 package com.aivech.tau.blockentity.power;
 
-import com.aivech.tau.Tau;
 import com.aivech.tau.block.power.BlockShaft;
 import com.aivech.tau.blockentity.BaseBE;
 import com.aivech.tau.blockentity.TauBEs;
@@ -16,7 +15,6 @@ public class ShaftBE extends BaseBE implements IRotaryBE {
 
     public ShaftBE() {
         super(TauBEs.SHAFT);
-        Tau.Log.debug("Shaft constructed");
         values = new BlockPowerValues();
     }
 

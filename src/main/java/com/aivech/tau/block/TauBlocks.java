@@ -23,6 +23,7 @@ public class TauBlocks {
     public static void init() {
         registerWithItemBlock(TEST_BLOCK);
         registerWithItemBlock(SHAFT);
+        registerWithItemBlock(DEBUG_ENGINE);
     }
 
     public static void register(BlockBase b) {
