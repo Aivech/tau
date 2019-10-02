@@ -10,15 +10,13 @@ import net.minecraft.util.registry.Registry;
 import static com.aivech.tau.Tau.MODID;
 
 public class TauItems {
-    public static final ItemBase TEST_ITEM = createSimpleItem("testitem");
+    public static final ItemGroup ITEMS = FabricItemGroupBuilder.build(new Identifier(MODID, "items"), () -> new ItemStack(TauItems.WRENCH));
+
     public static final ItemWrench WRENCH = new ItemWrench();
 
     public static void init() {
-        register(TEST_ITEM);
         register(WRENCH);
     }
-
-    public static final ItemGroup ITEMS = FabricItemGroupBuilder.build(new Identifier(MODID, "items"), () -> new ItemStack(TauItems.TEST_ITEM));
 
     private static ItemBase createSimpleItem(String id) {
         return new ItemBase(new Item.Settings().group(ITEMS), id);
