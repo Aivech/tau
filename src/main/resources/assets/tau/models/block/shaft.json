@@ -1,6 +1,7 @@
 {
-  "parent": "block/cube_all",
+  "parent": "block/cube_column",
   "textures": {
-    "all": "tau:block/shaft"
+    "end": "tau:block/shaft_end",
+    "side": "tau:block/shaft_side"
   }
 }

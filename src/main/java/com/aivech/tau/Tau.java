@@ -40,4 +40,29 @@ public class Tau implements ModInitializer {
         public static void fatal(String s) { log.fatal("[Tau] "+s); }
 
     }
+
+    public static boolean containsWord(String s, String word) {
+        if (s == null || s.length() < word.length()) return false;
+
+        int len = word.length();
+        if (s.substring(0, len).equals(word)) {
+            if (s.length() == word.length() || ! isWordChar(s.charAt(len))) return true;
+        }
+        for (int i = 0; i < s.length() - len; i++) {
+            if (! isWordChar(s.charAt(i))) {
+                if (s.substring(i + 1, i + 1 + len).equals(word)) {
+                    if (word.length() + i + 1 == s.length() || ! isWordChar(s.charAt(i + 1 + len))) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean isWordChar(char c) {
+        int codepoint = c;
+        if (codepoint == 0x27) return true; // an apostrophe
+        if (codepoint >= 0x30 && codepoint <= 0x39) return true; // 0-9
+        if (codepoint >= 0x41 && codepoint <= 0x5A) return true; // A-Z
+        return codepoint >= 0x61 && codepoint <= 0x7a;          // a-z
+    }
 }

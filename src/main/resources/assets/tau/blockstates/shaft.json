@@ -1,7 +1,16 @@
 {
   "variants": {
-    "": {
+    "axis=y": {
       "model": "tau:block/shaft"
+    },
+    "axis=z": {
+      "model": "tau:block/shaft",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "tau:block/shaft",
+      "x": 90,
+      "y": 90
     }
   }
 }
